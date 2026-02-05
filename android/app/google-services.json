@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "765114229210",
+    "project_id": "social-network-4b8e8",
+    "storage_bucket": "social-network-4b8e8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:765114229210:android:2c8b38b0eb7d74e755a0e3",
+        "android_client_info": {
+          "package_name": "com.example.family_task_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCakzaHPNCssmFpf14AMCMRMfcN-uITOJU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:765114229210:android:922f340e0ddc7ae255a0e3",
+        "android_client_info": {
+          "package_name": "com.example.social_network"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCakzaHPNCssmFpf14AMCMRMfcN-uITOJU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
