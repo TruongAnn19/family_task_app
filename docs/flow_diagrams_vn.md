@@ -71,4 +71,3 @@ Login success -> NotificationService.init() -> getDeviceToken() -> if token: _au
 
 Ghi chú:
 - Các sơ đồ trên là bản tóm tắt nhanh; tham khảo chi tiết trong `docs/app_flows_prompt_vn.md` để biết logic và các hàm gọi chính xác.
-- Nếu cần, tôi có thể chuyển các sơ đồ này sang định dạng hình ảnh (PNG/SVG) hoặc thêm sơ đồ tuần tự (sequence diagram) bằng PlantUML.
