@@ -6,6 +6,11 @@ import '../screens/dashboard_screen.dart';
 import '../services/notification_service.dart';
 
 class LoginScreen extends StatefulWidget {
+  final AuthService? authService;
+  final Function(String familyId, Member member)? onLoginSuccess;
+
+  LoginScreen({Key? key, this.authService, this.onLoginSuccess}) : super(key: key);
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -15,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  final AuthService _authService = AuthService();
+  late final AuthService _authService;
 
   bool _isLoading = false;
   bool _isFamilyFound = false;
@@ -26,11 +31,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    _authService = widget.authService ?? AuthService();
     _familyIdController.addListener(() {
       // rebuild so UI can react to family id input (e.g., hide register)
       setState(() {});
     });
   }
+
+
 
   @override
   void dispose() {
@@ -267,6 +275,12 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Sai mật khẩu!")));
         return;
       }
+    }
+
+    // Test Hook: bypass full login flow if testing
+    if (widget.onLoginSuccess != null) {
+      widget.onLoginSuccess!(_familyIdController.text, _selectedMember!);
+      return;
     }
 
     // Lưu thông tin vào bộ nhớ máy

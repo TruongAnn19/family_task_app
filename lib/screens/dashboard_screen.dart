@@ -217,46 +217,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Xin chào,",
-                style: TextStyle(color: Colors.teal.shade100, fontSize: 16),
-              ),
-              SizedBox(height: 4),
-              Text(
-                widget.currentUser.name,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Xin chào,",
+                  style: TextStyle(color: Colors.teal.shade100, fontSize: 16),
                 ),
-              ),
-              SizedBox(height: 8),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
+                SizedBox(height: 4),
+                Text(
+                  widget.currentUser.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                child: Row(
-                  children: [
-                    Icon(Icons.home, color: Colors.teal.shade50, size: 14),
-                    SizedBox(width: 4),
-                    Text(
-                      "ID nhà: ${widget.familyId}",
-                      style: TextStyle(
-                        color: Colors.teal.shade50,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                SizedBox(height: 8),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.home, color: Colors.teal.shade50, size: 14),
+                      SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          "ID nhà: ${widget.familyId}",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.teal.shade50,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          SizedBox(width: 16),
           Row(
             children: [
               // Admin Settings

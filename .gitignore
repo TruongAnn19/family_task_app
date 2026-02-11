@@ -43,3 +43,13 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Temp
+*.txt
+*.log
+result2.txt
+status.txt
+node_modules/
+package.json
+package-lock.json
+
