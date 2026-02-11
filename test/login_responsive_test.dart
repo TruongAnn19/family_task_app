@@ -57,6 +57,7 @@ void main() {
     });
 
     testWidgets('1. Admin Login Flow (Password Required)', (WidgetTester tester) async {
+      print('--- TEST 1: Admin Login ---');
       bool loginSuccess = false;
       
       await tester.pumpWidget(MaterialApp(
@@ -69,6 +70,7 @@ void main() {
       ));
 
       // 1. Enter Family ID
+      print('Step 1: Entering Family ID');
       final familyField = find.byType(TextField).at(0);
       await tester.enterText(familyField, 'test_family');
       await tester.tap(find.byIcon(Icons.search));
@@ -76,8 +78,10 @@ void main() {
 
       // Verify "Xin chào" or "Chào mừng trở lại" indicates family found
       expect(find.textContaining('Xin chào!'), findsOneWidget); // Adjusted based on code
+      print('Step 2: Family Found');
       
       // 2. Enter Username "AdminUser"
+      print('Step 3: Entering Admin Username');
       final userField = find.byType(TextField).at(1); // Username field appears
       await tester.enterText(userField, 'AdminUser');
       await tester.pumpAndSettle();
@@ -88,8 +92,10 @@ void main() {
 
       // 4. Verify Password Field appears (because AdminUser is admin)
       expect(find.text('Mật khẩu Admin'), findsOneWidget);
+      print('Step 4: Password Field Appeared (Correct)');
       
       // 5. Enter Correct Password
+      print('Step 5: Entering Password');
       final passField = find.byType(TextField).last;
       await tester.enterText(passField, '1234');
       await tester.tap(find.text('Vào Nhà'));
@@ -97,9 +103,11 @@ void main() {
       
       // Verify login success callback triggered
       expect(loginSuccess, isTrue);
+      print('Step 6: Login Success (Admin)');
     });
 
     testWidgets('2. Member Login Flow (No Password)', (WidgetTester tester) async {
+      print('--- TEST 2: Member Login ---');
       bool loginSuccess = false;
 
       await tester.pumpWidget(MaterialApp(
@@ -112,23 +120,28 @@ void main() {
       ));
 
       // 1. Enter Family ID
+      print('Step 1: Entering Family ID');
       await tester.enterText(find.byType(TextField).at(0), 'test_family');
       await tester.tap(find.byIcon(Icons.search));
       await tester.pumpAndSettle();
 
       // 2. Enter Username "RegularUser"
+      print('Step 2: Entering Member Username');
       await tester.enterText(find.byType(TextField).at(1), 'RegularUser');
       await tester.pumpAndSettle();
       
       // 3. Click "Tiếp tục"
+      print('Step 3: Clicking Continue');
       await tester.tap(find.text('Tiếp tục'));
       await tester.pumpAndSettle(); 
 
       // 4. Verify NO Password Field (Login success immediate)
       expect(find.text('Mật khẩu Admin'), findsNothing);
+      print('Step 4: No Password Field (Correct)');
       
       // Verify Success
       expect(loginSuccess, isTrue);
+      print('Step 5: Login Success (Member)');
     });
   });
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../helpers/zodiac_helper.dart';
+import '../helpers/calendar_style_helper.dart';
 import 'dart:ui';
 import '../models/household_model.dart';
 import '../models/weekly_schedule_model.dart';
@@ -60,12 +62,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           if (mounted) {
             // Sort by createdAt ascending (oldest to newest)
             requests.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-            print("DEBUG: Received ${requests.length} sent requests");
-            for (var r in requests) {
-              print(
-                "DEBUG: Request for taskId: ${r.taskId} - Status: ${r.status}",
-              );
-            }
             setState(() {
               _sentRequests.clear();
               for (var req in requests) {
@@ -76,10 +72,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
   }
 
-  // Load Calendar Events (keep existing Code)
+  // Load Calendar Events
   void _loadCalendarEvents() {
     _calendarService.getEventsStream(widget.familyId).listen((events) {
-      // ... existing code ...
       if (mounted) {
         setState(() {
           _events = {};
@@ -92,7 +87,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             if (_events[date] == null) _events[date] = [];
             _events[date]!.add(event);
           }
-          _selectedEvents = _getEventsForDay(_selectedDay!);
+          // Refresh selected events if selected day exists
+          if (_selectedDay != null) {
+            _selectedEvents = _getEventsForDay(_selectedDay!);
+          }
         });
       }
     });
@@ -134,12 +132,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50], // Light background
+      backgroundColor: Colors.grey[50],
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: Colors.teal))
           : Column(
               children: [
-                _buildHeader(), // Custom Header replacement for AppBar
+                _buildHeader(),
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: () async => _loadData(),
@@ -153,7 +151,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           SizedBox(height: 20),
                           _buildWeeklyHeader(),
                           SizedBox(height: 12),
-                          _buildSwapRequests(), // Show pending requests
+                          _buildSwapRequests(),
                           SizedBox(height: 12),
                           _buildPenaltyNoticeBoard(),
                           SizedBox(height: 10),
@@ -269,7 +267,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           SizedBox(width: 16),
           Row(
             children: [
-              // Admin Settings
               if (widget.currentUser.isAdmin)
                 Container(
                   decoration: BoxDecoration(
@@ -326,7 +323,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               SizedBox(width: 12),
-              // Logout
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
@@ -400,8 +396,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             IconButton(
               icon: Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
-              onPressed: () =>
-                  _openCalendar(context), // Keep button functional too
+              onPressed: () => _openCalendar(context),
             ),
           ],
         ),
@@ -415,17 +410,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           .collection('Households')
           .doc(widget.familyId)
           .collection('Notifications')
-          .orderBy('created_at', descending: true) // Lấy cái mới nhất
+          .orderBy('created_at', descending: true)
           .limit(1)
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return SizedBox.shrink(); // Không có phạt thì ẩn đi
+          return SizedBox.shrink();
         }
 
         var notice = PenaltyNotice.fromFirestore(snapshot.data!.docs.first);
 
-        // Chỉ hiện nếu thông báo được tạo cách đây dưới 2 ngày (để không hiện mãi cái cũ)
         if (DateTime.now().difference(notice.createdAt).inDays > 2) {
           return SizedBox.shrink();
         }
@@ -456,7 +450,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
               SizedBox(height: 8),
-              Text(notice.content, style: TextStyle(fontSize: 14)),
+              Text(
+                notice.content,
+                style: TextStyle(fontSize: 14),
+              ),
             ],
           ),
         );
@@ -464,9 +461,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Widget hiển thị việc của tôi
   Widget _buildMyTaskList() {
-    // Lọc ra việc của user hiện tại
     final myTasks =
         _schedule?.assignments
             .where((t) => t.assignedTo == widget.currentUser.name)
@@ -502,24 +497,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: myTasks.map((task) {
         int originalIndex = _schedule!.assignments.indexOf(task);
         SwapRequest? request = _sentRequests[task.taskId];
-        print(
-          "DEBUG: Building task ${task.taskId} - Request Status: ${request?.status}",
-        );
 
-        // Determine UI based on request status
         Widget tailWidget;
 
         if (task.isDone) {
           tailWidget = SizedBox.shrink();
         } else if (request == null || request.status == 'rejected') {
-          // No request or Rejected -> Show Swap Button
           tailWidget = IconButton(
             icon: Icon(Icons.swap_horiz, color: Colors.blue.shade300),
             tooltip: "Đổi việc này",
             onPressed: () => _showSwapDialog(task),
           );
         } else if (request.status == 'pending') {
-          // Pending -> Show Cancel Button
           tailWidget = TextButton.icon(
             icon: Icon(Icons.close, size: 16, color: Colors.red),
             label: Text(
@@ -531,7 +520,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
           );
         } else if (request.status == 'accepted') {
-          // Accepted -> Show Text
           tailWidget = Container(
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
@@ -568,7 +556,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                // Checkbox
                 SizedBox(
                   width: 24,
                   height: 24,
@@ -582,8 +569,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
                 SizedBox(width: 12),
-
-                // Content
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -611,8 +596,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                 ),
-
-                // Dynamic Tail Widget (Swap/Cancel/Status)
                 tailWidget,
               ],
             ),
@@ -622,7 +605,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Widget hiển thị danh sách tất cả (Read-only)
   Widget _buildAllTasksList() {
     return Container(
       decoration: BoxDecoration(
@@ -700,239 +682,525 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
+            final zodiacGradient = ZodiacHelper.getGradient(_focusedDay.year);
+            final canChi = ZodiacHelper.getCanChi(_focusedDay.year);
+
+            // 1. Check Tet Holiday (Lunar Logic)
+            final lunarDate = Lunar(date: _focusedDay, createdFromSolar: true);
+            final bool isTetHoliday = (lunarDate.month == 12 && lunarDate.day >= 29) || 
+                                      (lunarDate.month == 1 && lunarDate.day <= 6);
+
+            // 2. Check Special Holiday (Solar/Lunar Logic)
+            final HolidayTheme? holidayTheme = ZodiacHelper.getSpecialHolidayTheme(
+              _focusedDay, 
+              lunarDay: lunarDate.day,
+              lunarMonth: lunarDate.month,
+            );
+
+            // 3. Determine Active Theme Colors
+            List<Color> activeGradient;
+            Color activeColor;
+            bool useRedTheme = false;
+
+            if (holidayTheme != null) {
+              activeGradient = holidayTheme.gradient;
+              activeColor = activeGradient[0];
+              useRedTheme = holidayTheme.isRedTheme;
+            } else if (isTetHoliday) {
+              activeGradient = CalendarStyleHelper.tetGradient;
+              activeColor = CalendarStyleHelper.tetRed;
+              useRedTheme = true;
+            } else {
+              activeGradient = [zodiacGradient[0], zodiacGradient[1]];
+              activeColor = zodiacGradient[0];
+              useRedTheme = false;
+            }
+
             return Dialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(24),
               ),
+              clipBehavior: Clip.hardEdge, 
+              backgroundColor: Colors.transparent, 
+              elevation: 0, 
+              insetPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: Container(
-                padding: EdgeInsets.all(16),
-                height: MediaQuery.of(context).size.height * 0.85,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                height: MediaQuery.of(context).size.height * 0.9,
+                decoration: CalendarStyleHelper.dialogDecoration.copyWith(
+                  border: Border.all(
+                    color: activeColor.withOpacity(0.5),
+                    width: 2,
+                  ),
                 ),
-                child: Column(
+                child: Stack(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // === 1. BACKGROUND LAYERS ===
+                    Positioned.fill(
+                      child: ZodiacHelper.buildZodiacBackground(
+                        _focusedDay.year,
+                        opacity: 0.08,
+                        isTet: isTetHoliday, // Tet logic for background pattern
+                        holidayTheme: holidayTheme, // Special holiday override
+                      ),
+                    ),
+                    CalendarStyleHelper.buildCornerOrnament(true, zodiacGradient: (isTetHoliday || holidayTheme != null) ? activeGradient : null), 
+                    CalendarStyleHelper.buildCornerOrnament(false, zodiacGradient: (isTetHoliday || holidayTheme != null) ? activeGradient : null),
+
+                    // === 2. MAIN CONTENT ===
+                    Column(
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Lịch Vạn Niên",
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blueGrey.shade900,
-                                fontFamily: 'serif',
-                              ),
-                            ),
-                            Text(
-                              "Năm ${_getVietnameseZodiac(_focusedDay.year)} ${_focusedDay.year}",
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.close, color: Colors.grey[800]),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ],
-                    ),
-                    Divider(color: Colors.red.shade200),
-                    // Calendar Content
-                    TableCalendar<CalendarEvent>(
-                      firstDay: DateTime.utc(2020, 10, 16),
-                      lastDay: DateTime.utc(2030, 3, 14),
-                      focusedDay: _focusedDay,
-                      selectedDayPredicate: (day) =>
-                          isSameDay(_selectedDay, day),
-                      eventLoader: _getEventsForDay,
-                      calendarFormat: CalendarFormat.month,
-                      headerStyle: HeaderStyle(
-                        formatButtonVisible: false,
-                        titleCentered: true,
-                        titleTextStyle: TextStyle(
-                          color: Colors.red.shade900,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                        leftChevronIcon: Icon(
-                          Icons.chevron_left,
-                          color: Colors.red.shade700,
-                        ),
-                        rightChevronIcon: Icon(
-                          Icons.chevron_right,
-                          color: Colors.red.shade700,
-                        ),
-                      ),
-                      calendarStyle: CalendarStyle(
-                        todayDecoration: BoxDecoration(
-                          color: Colors.orange.shade300,
-                          shape: BoxShape.circle,
-                        ),
-                        selectedDecoration: BoxDecoration(
-                          color: Colors.red.shade600,
-                          shape: BoxShape.circle,
-                        ),
-                        markerDecoration: BoxDecoration(
-                          color: Colors.teal,
-                          shape: BoxShape.circle,
-                        ),
-                        outsideDaysVisible: false,
-                      ),
-                      onDaySelected: (selectedDay, focusedDay) {
-                        setStateDialog(() {
-                          _selectedDay = selectedDay;
-                          _focusedDay = focusedDay;
-                          _selectedEvents = _getEventsForDay(selectedDay);
-                        });
-                      },
-                      onPageChanged: (focusedDay) {
-                        setStateDialog(() {
-                          _focusedDay = focusedDay;
-                        });
-                      },
-                      calendarBuilders: CalendarBuilders(
-                        markerBuilder: (context, date, events) {
-                          if (events.isEmpty) return SizedBox();
-                          return Positioned(
-                            bottom: 1,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: events.take(3).map((event) {
-                                return Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 1.5),
-                                  width: 5,
-                                  height: 5,
-                                  decoration: BoxDecoration(
-                                    color: event.hasReminder
-                                        ? Colors.red
-                                        : Colors.blue,
-                                    shape: BoxShape.circle,
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          );
-                        },
-                        defaultBuilder: (context, day, focusedDay) =>
-                            _buildCalendarCell(day),
-                        selectedBuilder: (context, day, focusedDay) =>
-                            _buildCalendarCell(day, isSelected: true),
-                        todayBuilder: (context, day, focusedDay) =>
-                            _buildCalendarCell(day, isToday: true),
-                      ),
-                    ),
-                    Divider(),
-                    Builder(
-                      builder: (context) {
-                        // Calculate holiday for selected day
-                        final lunarSelected = Lunar(
-                          date: _selectedDay!,
-                          createdFromSolar: true,
-                        );
-                        String? solarHoliday = _getSolarHoliday(_selectedDay!);
-                        String? lunarHoliday = _getLunarHoliday(lunarSelected);
-
-                        // Combine them if both exist
-                        List<String> holidays = [];
-                        if (solarHoliday != null) holidays.add(solarHoliday);
-                        if (lunarHoliday != null) holidays.add(lunarHoliday);
-
-                        String? holiday = holidays.isNotEmpty
-                            ? holidays.join(", ")
-                            : null;
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Sự kiện ngày ${_selectedDay!.day}/${_selectedDay!.month}",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                        // --- HEADER SECTION ---
+                        Container(
+                          padding: EdgeInsets.fromLTRB(24, 20, 16, 12),
+                          decoration: BoxDecoration(
+                            border: Border(bottom: BorderSide(color: Colors.black12)),
+                            color: useRedTheme 
+                                ? activeColor.withOpacity(0.05) 
+                                : Colors.white.withOpacity(0.85),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ShaderMask(
+                                      shaderCallback: (bounds) => LinearGradient(
+                                        colors: useRedTheme 
+                                            ? activeGradient 
+                                            : [zodiacGradient[0], zodiacGradient[1], zodiacGradient[0]],
+                                        stops: useRedTheme ? [0.0, 1.0] : [0.0, 0.5, 1.0],
+                                      ).createShader(bounds),
+                                      child: Text(
+                                        "Lịch Vạn Niên",
+                                        style: CalendarStyleHelper.calendarTitleStyle(activeColor),
+                                      ),
+                                    ),
+                                    SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        // Badge con giáp
+                                        ZodiacHelper.buildZodiacBadge(_focusedDay.year),
+                                        SizedBox(width: 8),
+                                        // Badge tháng
+                                        Container(
+                                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: useRedTheme ? activeColor.withOpacity(0.3) : Colors.grey.shade400
+                                            ),
+                                            borderRadius: BorderRadius.circular(12),
+                                            color: Colors.white,
+                                          ),
+                                          child: Text(
+                                            "Tháng ${_focusedDay.month}",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: useRedTheme ? activeColor : Colors.grey.shade700,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.add_circle,
-                                    color: Colors.blue,
+                              ),
+                              // Close Button
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () => Navigator.pop(context),
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: useRedTheme ? Colors.white : Colors.grey.shade100, 
+                                      shape: BoxShape.circle,
+                                      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+                                      border: useRedTheme ? Border.all(color: activeColor.withOpacity(0.2)) : null,
+                                    ),
+                                    child: Icon(
+                                      Icons.close, 
+                                      color: useRedTheme ? activeColor : Colors.grey[800], 
+                                      size: 22
+                                    ),
                                   ),
-                                  onPressed: () => _showAddEventDialog(
-                                    context,
-                                    setStateDialog,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // ─── SCROLLABLE BODY ───
+                        Expanded(
+                          child: SingleChildScrollView(
+                            physics: BouncingScrollPhysics(),
+                            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                // ── CALENDAR GRID ──
+                                TableCalendar<CalendarEvent>(
+                                  firstDay: DateTime.utc(2020, 10, 16),
+                                  lastDay: DateTime.utc(2030, 3, 14),
+                                  focusedDay: _focusedDay,
+                                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                                  eventLoader: _getEventsForDay,
+                                  calendarFormat: CalendarFormat.month,
+                                  availableGestures: AvailableGestures.horizontalSwipe,
+                                  rowHeight: 64, // Tăng chiều cao ô ngày
+
+                                  // Navigation Header
+                                  headerStyle: HeaderStyle(
+                                    formatButtonVisible: false,
+                                    titleCentered: true,
+                                    titleTextStyle: TextStyle(
+                                      color: zodiacGradient[0],
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 18,
+                                      fontFamily: 'serif',
+                                      letterSpacing: 0.5,
+                                    ),
+                                    leftChevronIcon: Container(
+                                      padding: EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: zodiacGradient[0].withOpacity(0.08),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(Icons.chevron_left, color: zodiacGradient[0], size: 22),
+                                    ),
+                                    rightChevronIcon: Container(
+                                      padding: EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: zodiacGradient[0].withOpacity(0.08),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(Icons.chevron_right, color: zodiacGradient[0], size: 22),
+                                    ),
+                                    headerMargin: EdgeInsets.only(bottom: 8),
                                   ),
+
+                                  // Day-of-week style
+                                  daysOfWeekStyle: DaysOfWeekStyle(
+                                    weekdayStyle: TextStyle(
+                                      color: zodiacGradient[0].withOpacity(0.7),
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 13,
+                                    ),
+                                    weekendStyle: TextStyle(
+                                      color: Color(0xFFE53935).withOpacity(0.7),
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+
+                                  // Calendar Style (fallback — custom builders override most)
+                                  calendarStyle: CalendarStyle(
+                                    outsideDaysVisible: false,
+                                    cellMargin: EdgeInsets.all(3),
+                                    defaultTextStyle: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF263238)),
+                                    weekendTextStyle: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFD32F2F)),
+                                    todayDecoration: BoxDecoration(),
+                                    selectedDecoration: BoxDecoration(),
+                                    markerDecoration: BoxDecoration(),
+                                  ),
+
+                                  // Handlers
+                                  onDaySelected: (selectedDay, focusedDay) {
+                                    setStateDialog(() {
+                                      _selectedDay = selectedDay;
+                                      _focusedDay = focusedDay;
+                                      _selectedEvents = _getEventsForDay(selectedDay);
+                                    });
+                                  },
+                                  onPageChanged: (focusedDay) {
+                                    setStateDialog(() {
+                                      _focusedDay = focusedDay;
+                                    });
+                                  },
+
+                                  // Custom Builders
+                                  calendarBuilders: CalendarBuilders(
+                                    markerBuilder: (context, date, events) {
+                                      // Markers handled inside cell builders
+                                      return SizedBox();
+                                    },
+                                    defaultBuilder: (context, day, focusedDay) =>
+                                        _buildCalendarCell(day, zodiacGradient: zodiacGradient),
+                                    selectedBuilder: (context, day, focusedDay) =>
+                                        _buildCalendarCell(day, isSelected: true, zodiacGradient: zodiacGradient),
+                                    todayBuilder: (context, day, focusedDay) =>
+                                        _buildCalendarCell(day, isToday: true, zodiacGradient: zodiacGradient),
+                                    outsideBuilder: (context, day, focusedDay) => SizedBox(),
+                                  ),
+                                ),
+
+                                // ── DECORATIVE DIVIDER ──
+                                CalendarStyleHelper.buildDecorativeDivider(zodiacGradient),
+
+                                // ── EVENT SECTION ──
+                                Builder(
+                                  builder: (context) {
+                                    final lunarSelected = Lunar(date: _selectedDay!, createdFromSolar: true);
+                                    String? solarHoliday = _getSolarHoliday(_selectedDay!);
+                                    String? lunarHoliday = _getLunarHoliday(lunarSelected);
+                                    List<String> holidays = [
+                                      if (solarHoliday != null) solarHoliday,
+                                      if (lunarHoliday != null) lunarHoliday,
+                                    ];
+                                    String? holiday = holidays.isNotEmpty ? holidays.join(", ") : null;
+
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Event header
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "📅 Ngày ${_selectedDay!.day}/${_selectedDay!.month}/${_selectedDay!.year}",
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16,
+                                                    color: Color(0xFF263238),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 2),
+                                                Text(
+                                                  "Âm lịch: ${lunarSelected.day}/${lunarSelected.month}",
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: CalendarStyleHelper.lunarTextColor,
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Material(
+                                              color: Colors.transparent,
+                                              child: InkWell(
+                                                onTap: () => _showAddEventDialog(context, setStateDialog),
+                                                borderRadius: BorderRadius.circular(12),
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    gradient: LinearGradient(colors: zodiacGradient),
+                                                    borderRadius: BorderRadius.circular(12),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: zodiacGradient[0].withOpacity(0.3),
+                                                        blurRadius: 6,
+                                                        offset: Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Icon(Icons.add, color: Colors.white, size: 18),
+                                                      SizedBox(width: 4),
+                                                      Text("Thêm", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+                                        SizedBox(height: 12),
+
+                                        // Holiday banner
+                                        if (holiday != null)
+                                          Container(
+                                            width: double.infinity,
+                                            margin: EdgeInsets.only(bottom: 12),
+                                            padding: EdgeInsets.all(14),
+                                            decoration: CalendarStyleHelper.holidayBannerDecoration(zodiacGradient),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.all(8),
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xFFE53935).withOpacity(0.1),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Text("🏮", style: TextStyle(fontSize: 18)),
+                                                ),
+                                                SizedBox(width: 12),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        "Ngày lễ",
+                                                        style: TextStyle(
+                                                          fontSize: 11,
+                                                          color: Colors.grey[600],
+                                                          fontWeight: FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 2),
+                                                      Text(
+                                                        holiday,
+                                                        style: TextStyle(
+                                                          color: Color(0xFFC62828),
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                        // Event list or empty state
+                                        if (_selectedEvents.isEmpty)
+                                          Container(
+                                            margin: EdgeInsets.symmetric(vertical: 20),
+                                            padding: EdgeInsets.all(24),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(0.6),
+                                              borderRadius: BorderRadius.circular(16),
+                                              border: Border.all(color: Colors.grey.shade200),
+                                            ),
+                                            child: Center(
+                                              child: Column(
+                                                children: [
+                                                  Icon(Icons.event_available, size: 40, color: Colors.grey.shade300),
+                                                  SizedBox(height: 8),
+                                                  Text(
+                                                    "Chưa có sự kiện",
+                                                    style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                                                  ),
+                                                  SizedBox(height: 4),
+                                                  Text(
+                                                    "Nhấn nút \"Thêm\" để tạo sự kiện mới",
+                                                    style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        else
+                                          ListView.separated(
+                                            shrinkWrap: true,
+                                            physics: NeverScrollableScrollPhysics(),
+                                            itemCount: _selectedEvents.length,
+                                            separatorBuilder: (context, index) => SizedBox(height: 10),
+                                            itemBuilder: (context, index) {
+                                              final event = _selectedEvents[index];
+                                              return Container(
+                                                decoration: CalendarStyleHelper.eventCardDecoration(
+                                                  hasReminder: event.hasReminder,
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                                  child: Row(
+                                                    children: [
+                                                      // Icon
+                                                      Container(
+                                                        padding: EdgeInsets.all(10),
+                                                        decoration: BoxDecoration(
+                                                          color: (event.hasReminder
+                                                                  ? Color(0xFFE53935)
+                                                                  : Color(0xFF42A5F5))
+                                                              .withOpacity(0.1),
+                                                          borderRadius: BorderRadius.circular(12),
+                                                        ),
+                                                        child: Icon(
+                                                          event.hasReminder ? Icons.notifications_active : Icons.event_note,
+                                                          color: event.hasReminder ? Color(0xFFE53935) : Color(0xFF42A5F5),
+                                                          size: 22,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 12),
+                                                      // Content
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(
+                                                              event.title,
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.w700,
+                                                                fontSize: 15,
+                                                                color: Color(0xFF263238),
+                                                              ),
+                                                            ),
+                                                            if (event.note.isNotEmpty) ...[
+                                                              SizedBox(height: 3),
+                                                              Text(
+                                                                event.note,
+                                                                style: TextStyle(
+                                                                  color: Colors.grey[600],
+                                                                  fontSize: 13,
+                                                                ),
+                                                                maxLines: 2,
+                                                                overflow: TextOverflow.ellipsis,
+                                                              ),
+                                                            ],
+                                                            if (event.hasReminder) ...[
+                                                              SizedBox(height: 4),
+                                                              Row(
+                                                                children: [
+                                                                  Icon(Icons.alarm, size: 12, color: Colors.orange),
+                                                                  SizedBox(width: 4),
+                                                                  Text(
+                                                                    "Có nhắc nhở",
+                                                                    style: TextStyle(
+                                                                      fontSize: 11,
+                                                                      color: Colors.orange[700],
+                                                                      fontWeight: FontWeight.w600,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      // Delete button
+                                                      Material(
+                                                        color: Colors.transparent,
+                                                        child: InkWell(
+                                                          onTap: () async {
+                                                            await _calendarService.deleteEvent(widget.familyId, event.id);
+                                                            setStateDialog(() {
+                                                              _selectedEvents = _getEventsForDay(_selectedDay!);
+                                                            });
+                                                          },
+                                                          borderRadius: BorderRadius.circular(8),
+                                                          child: Padding(
+                                                            padding: EdgeInsets.all(8),
+                                                            child: Icon(Icons.delete_outline, size: 20, color: Colors.grey[400]),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        SizedBox(height: 24),
+                                      ],
+                                    );
+                                  },
                                 ),
                               ],
                             ),
-                            if (holiday != null)
-                              Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(8),
-                                margin: EdgeInsets.only(bottom: 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.shade50,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: Colors.red.shade200,
-                                  ),
-                                ),
-                                child: Text(
-                                  "🎉 Hôm nay là: $holiday",
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        );
-                      },
-                    ),
-                    Expanded(
-                      child: _selectedEvents.isEmpty
-                          ? Center(child: Text("Không có sự kiện"))
-                          : ListView.builder(
-                              itemCount: _selectedEvents.length,
-                              itemBuilder: (context, index) {
-                                final event = _selectedEvents[index];
-                                return ListTile(
-                                  dense: true,
-                                  leading: Icon(
-                                    Icons.event_note,
-                                    color: event.hasReminder
-                                        ? Colors.red
-                                        : Colors.blue,
-                                  ),
-                                  title: Text(event.title),
-                                  subtitle: Text(event.note),
-                                  trailing: IconButton(
-                                    icon: Icon(
-                                      Icons.delete,
-                                      size: 20,
-                                      color: Colors.grey,
-                                    ),
-                                    onPressed: () async {
-                                      await _calendarService.deleteEvent(
-                                        widget.familyId,
-                                        event.id,
-                                      );
-                                      // Update UI locally inside Dialog
-                                      setStateDialog(() {
-                                        _selectedEvents = _getEventsForDay(
-                                          _selectedDay!,
-                                        );
-                                      });
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -944,67 +1212,98 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Build Calendar Cell with Lunar Date
+  // Build Calendar Cell with Lunar Date — Premium Design
   Widget _buildCalendarCell(
     DateTime day, {
     bool isSelected = false,
     bool isToday = false,
+    List<Color>? zodiacGradient,
   }) {
-    // Convert to Lunar
     final lunarDate = Lunar(date: day, createdFromSolar: true);
+    final gradient = zodiacGradient ?? ZodiacHelper.getGradient(day.year);
 
     String? solarHoliday = _getSolarHoliday(day);
     String? lunarHoliday = _getLunarHoliday(lunarDate);
+    bool isWeekend = day.weekday == DateTime.saturday || day.weekday == DateTime.sunday;
+    bool hasHoliday = solarHoliday != null || lunarHoliday != null;
+    bool isRam = lunarDate.day == 15; // Rằm
+    bool isMung1 = lunarDate.day == 1; // Mùng 1
+    bool hasEvents = _getEventsForDay(day).isNotEmpty;
 
-    BoxDecoration? decoration;
-    TextStyle dayStyle = TextStyle(color: Colors.black);
-    TextStyle lunarStyle = TextStyle(fontSize: 10, color: Colors.grey);
-    TextStyle holidayStyle = TextStyle(
-      fontSize: 9,
-      color: Colors.red,
-      fontWeight: FontWeight.bold,
-    );
-
+    // Cell decoration
+    BoxDecoration cellDecor;
     if (isSelected) {
-      decoration = BoxDecoration(color: Colors.blue, shape: BoxShape.circle);
-      dayStyle = TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
-      lunarStyle = TextStyle(fontSize: 10, color: Colors.white70);
-      holidayStyle = TextStyle(
-        fontSize: 9,
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-      );
+      cellDecor = CalendarStyleHelper.selectedCellDecoration(gradient);
     } else if (isToday) {
-      decoration = BoxDecoration(
-        color: Colors.blue.withOpacity(0.3),
-        shape: BoxShape.circle,
-      );
-      dayStyle = TextStyle(color: Colors.blue, fontWeight: FontWeight.bold);
+      cellDecor = CalendarStyleHelper.todayCellDecoration(gradient);
+    } else if (hasHoliday) {
+      cellDecor = CalendarStyleHelper.holidayCellDecoration();
+    } else {
+      cellDecor = CalendarStyleHelper.defaultCellDecoration();
     }
 
-    // Custom Highlighting for Holidays (Only if not selected)
-    if (!isSelected) {
-      if (solarHoliday != null) {
-        dayStyle = TextStyle(color: Colors.red, fontWeight: FontWeight.bold);
-      }
-      if (lunarHoliday != null) {
-        lunarStyle = TextStyle(
-          fontSize: 10,
-          color: Colors.red,
-          fontWeight: FontWeight.bold,
-        );
-      }
+    // Text styles
+    TextStyle dayStyle = CalendarStyleHelper.solarDateStyle(isSelected, isToday, isWeekend);
+    TextStyle lunarStyle = CalendarStyleHelper.lunarDateStyle(isSelected);
+
+    if (!isSelected && hasHoliday) {
+      dayStyle = dayStyle.copyWith(color: Color(0xFFE53935));
+      lunarStyle = lunarStyle.copyWith(color: Color(0xFFE53935), fontWeight: FontWeight.bold);
     }
 
     return Container(
-      margin: EdgeInsets.all(4.0),
-      alignment: Alignment.center,
-      decoration: decoration,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      margin: EdgeInsets.all(2),
+      clipBehavior: Clip.hardEdge,
+      decoration: cellDecor,
+      child: Stack(
+        clipBehavior: Clip.hardEdge,
+        alignment: Alignment.center,
         children: [
-          Text("${day.day}", style: dayStyle),
-          Text("${lunarDate.day}/${lunarDate.month}", style: lunarStyle),
+          // Main content
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 4),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Ngày dương — To, đậm
+                Text("${day.day}", style: dayStyle),
+                // Ngày âm — Nhỏ, nhạt
+                Text(
+                  "${lunarDate.day}/${lunarDate.month}",
+                  style: lunarStyle,
+                ),
+              ],
+            ),
+          ),
+
+          // Bottom markers
+          Positioned(
+            bottom: 2,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Đỏ: Ngày lễ
+                if (hasHoliday)
+                  CalendarStyleHelper.buildHolidayMarker(),
+                // Vàng: Rằm / Mùng 1
+                if (!hasHoliday && (isRam || isMung1))
+                  CalendarStyleHelper.buildLunarSpecialMarker(),
+                // Có sự kiện
+                if (hasEvents) ...[
+                  if (hasHoliday || isRam || isMung1) SizedBox(width: 3),
+                  Container(
+                    width: 5,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.white70 : Color(0xFF42A5F5),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -1145,12 +1444,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       reminderTime: reminderTime,
                     );
 
-                    // Add to Firestore
                     await _calendarService.addEvent(newEvent);
 
-                    // Schedule notification if reminder set
                     if (_setReminder && reminderTime != null) {
-                      // Use hashcode of ID for notification ID (simple hack)
                       await NotificationService.scheduleEventReminder(
                         id.hashCode,
                         "Nhắc nhở: ${newEvent.title}",
@@ -1159,14 +1455,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       );
                     }
 
-                    Navigator.pop(context); // Close Add Dialog
+                    Navigator.pop(context);
 
-                    // Update Parent UI (Event List)
                     setStateParent(() {
-                      // The stream listener will handle updating _events map,
-                      // but we might want to manually refresh the list immediately for snappiness
-                      // or just rely on stream.
-                      // For now stream is async, so list might update a split second later.
+                      // Trigger rebuild or let stream update
                     });
                   },
                   child: Text("Lưu"),
@@ -1178,8 +1470,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     );
   }
-  // --- SWAP REQUEST UI ---
 
+  // --- SWAP REQUEST UI ---
   Widget _buildSwapRequests() {
     return StreamBuilder<List<SwapRequest>>(
       stream: _taskService.getSwapRequestsStream(
@@ -1262,7 +1554,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       req,
                                       true,
                                     );
-                                    // Reload data to show updated task list immediately
                                     _loadData();
                                   },
                                   child: Text("Đồng ý"),
@@ -1283,7 +1574,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _showSwapDialog(TaskAssignment task) async {
-    // Lấy danh sách thành viên (trừ bản thân)
     var householdDoc = await FirebaseFirestore.instance
         .collection('Households')
         .doc(widget.familyId)
@@ -1352,42 +1642,5 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
       },
     );
-  }
-
-  String _getVietnameseZodiac(int year) {
-    List<String> zodiacs = [
-      "Thân (Khỉ)",
-      "Dậu (Gà)",
-      "Tuất (Chó)",
-      "Hợi (Lợn)",
-      "Tý (Chuột)",
-      "Sửu (Trâu)",
-      "Dần (Hổ)",
-      "Mão (Mèo)",
-      "Thìn (Rồng)",
-      "Tỵ (Rắn)",
-      "Ngọ (Ngựa)",
-      "Mùi (Dê)",
-    ];
-    return zodiacs[year % 12];
-  }
-
-  String _getZodiacImage(int year) {
-    int index = year % 12;
-    // Map index to English keywords for image search or specific URLs
-    // 0: Monkey, 1: Rooster, 2: Dog, 3: Pig, 4: Rat, 5: Ox, 6: Tiger, 7: Cat, 8: Dragon, 9: Snake, 10: Horse, 11: Goat
-
-    // Using high quality generic art style images (Placeholder)
-    switch (index) {
-      case 10: // Horse (2026)
-        return 'https://static.vecteezy.com/system/resources/previews/065/384/128/non_2x/3d-red-podium-round-stage-for-happy-chinese-new-year-2026-horse-zodiac-vector.jpg'; // Placeholder adjusted to look festive
-      case 8: // Dragon (2024)
-        return 'https://img.freepik.com/premium-vector/vietnamese-new-year-dragon-decoration_23-2151110000.jpg'; // Example
-      case 9: // Snake (2025)
-        return 'https://thumbs.dreamstime.com/b/year-snake-chinese-zodiac-symbol-vector-illustration-163456789.jpg';
-      default:
-        // Fallback to a nice generic Lunar New Year background if specific animal not found
-        return 'https://img.freepik.com/free-vector/flat-tet-background_23-2149233000.jpg';
-    }
   }
 }
