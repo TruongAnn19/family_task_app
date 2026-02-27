@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/household_model.dart';
 import '../../services/auth_service.dart';
+import 'package:family_task_app/l10n/app_localizations.dart';
 
 class AdminScreen extends StatefulWidget {
   final String familyId;
@@ -42,14 +43,14 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
           children: [
             Icon(Icons.person_add, color: Colors.teal),
             SizedBox(width: 10),
-            Text("Thêm thành viên", style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold)),
+            Text(AppLocalizations.of(context)!.addMember, style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold)),
           ],
         ),
         content: TextField(
           controller: _nameController,
           decoration: InputDecoration(
-            labelText: "Tên thành viên",
-            hintText: "Ví dụ: Bình",
+            labelText: AppLocalizations.of(context)!.memberNameLabel,
+            hintText: AppLocalizations.of(context)!.memberNameHint,
             prefixIcon: Icon(Icons.account_circle, color: Colors.teal),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
@@ -59,7 +60,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context), // Hủy
-            child: Text("Hủy", style: TextStyle(color: Colors.grey)),
+            child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -76,11 +77,11 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 _loadMembers(); // Tải lại danh sách để hiện tên mới
                 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Đã thêm $name vào nhà!")),
+                  SnackBar(content: Text(AppLocalizations.of(context)!.addedMemberToFamily(name))),
                 );
               }
             },
-            child: Text("Thêm"),
+            child: Text(AppLocalizations.of(context)!.add),
           ),
         ],
       ),
@@ -91,7 +92,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   void _deleteMember(Member member) async {
     if (member.isAdmin) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Không thể xóa Admin!")),
+        SnackBar(content: Text(AppLocalizations.of(context)!.cannotDeleteAdmin)),
       );
       return;
     }
@@ -105,14 +106,14 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
           children: [
             Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
             SizedBox(width: 10),
-            Text("Xác nhận xóa", style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(AppLocalizations.of(context)!.confirmDelete, style: TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
-        content: Text("Bạn có chắc muốn xóa ${member.name} khỏi nhà không?", style: TextStyle(fontSize: 16)),
+        content: Text(AppLocalizations.of(context)!.areYouSureDeleteMember(member.name), style: TextStyle(fontSize: 16)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx), 
-            child: Text("Hủy", style: TextStyle(color: Colors.grey))
+            child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.grey))
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -124,7 +125,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               await _authService.removeMember(widget.familyId, member);
               _loadMembers(); // Reload list
             },
-            child: Text("Xóa"),
+            child: Text(AppLocalizations.of(context)!.delete),
           ),
         ],
       ),
@@ -173,7 +174,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 ),
                 SizedBox(width: 16),
                 Text(
-                  "Thành Viên",
+                  AppLocalizations.of(context)!.membersTab,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -225,7 +226,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                           subtitle: Text(
-                            member.isAdmin ? "Chủ hộ (Admin)" : "Thành viên",
+                            member.isAdmin ? AppLocalizations.of(context)!.headOfHousehold : AppLocalizations.of(context)!.regularMember,
                             style: TextStyle(color: Colors.grey[600]),
                           ),
                           trailing: member.isAdmin
@@ -251,7 +252,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddMemberDialog,
         icon: Icon(Icons.person_add),
-        label: Text("Thêm Thành Viên"),
+        label: Text(AppLocalizations.of(context)!.addMemberFab),
         backgroundColor: Colors.teal,
         elevation: 4,
       ),

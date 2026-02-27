@@ -18,7 +18,7 @@ import '../models/calendar_event_model.dart';
 import '../services/calendar_service.dart';
 import '../services/notification_service.dart';
 import '../models/swap_request_model.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:family_task_app/l10n/app_localizations.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String familyId;
@@ -796,7 +796,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             color: Colors.white,
                                           ),
                                           child: Text(
-                                            "Tháng ${_focusedDay.month}",
+                                            AppLocalizations.of(context)!.month(_focusedDay.month),
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: useRedTheme ? activeColor : Colors.grey.shade700,

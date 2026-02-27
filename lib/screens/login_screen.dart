@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import '../models/household_model.dart';
 import '../screens/dashboard_screen.dart';
 import '../services/notification_service.dart';
+import 'package:family_task_app/l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   final AuthService? authService;
@@ -69,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _isFamilyFound = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Mã nhà chưa tồn tại. Hãy đăng ký mới!")),
+        SnackBar(content: Text(AppLocalizations.of(context)!.familyIdNotExist)),
       );
     }
     setState(() => _isLoading = false);
@@ -81,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String username = _usernameController.text.trim();
     if (username.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Vui lòng nhập username")),
+        SnackBar(content: Text(AppLocalizations.of(context)!.enterUsername)),
       );
       setState(() => _isLoading = false);
       return;
@@ -97,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (found == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Không tìm thấy thành viên. Bạn có thể đăng ký.")),
+        SnackBar(content: Text(AppLocalizations.of(context)!.memberNotFound)),
       );
       setState(() => _isLoading = false);
       return;
@@ -137,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 Icon(Icons.person_add, size: 50, color: Colors.teal),
                 SizedBox(height: 10),
-                Text('Đăng ký tài khoản', style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold)),
+                Text(AppLocalizations.of(context)!.registerAccount, style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold)),
               ],
             ),
             content: SingleChildScrollView(
@@ -147,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextField(
                     controller: _dFamilyController,
                     decoration: InputDecoration(
-                        labelText: 'ID nhà (Family ID)',
+                        labelText: AppLocalizations.of(context)!.familyIdLabel,
                         prefixIcon: Icon(Icons.home),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         filled: true,
@@ -158,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextField(
                     controller: _dUserController,
                     decoration: InputDecoration(
-                        labelText: 'Username',
+                        labelText: AppLocalizations.of(context)!.usernameLabel,
                         prefixIcon: Icon(Icons.person),
                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         filled: true,
@@ -169,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextField(
                     controller: _dPassController,
                     decoration: InputDecoration(
-                        labelText: 'Mật khẩu',
+                        labelText: AppLocalizations.of(context)!.passwordLabel,
                         prefixIcon: Icon(Icons.lock),
                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         filled: true,
@@ -183,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: Text('Huỷ', style: TextStyle(color: Colors.grey)),
+                child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.grey)),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -199,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         String pass = _dPassController.text;
                         if (fid.isEmpty || uname.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Vui lòng điền đủ thông tin')));
+                              SnackBar(content: Text(AppLocalizations.of(context)!.fillAllInfo)));
                           setStateDialog(() => _dialogLoading = false);
                           return;
                         }
@@ -209,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           // Nếu nhà đã có -> kiểm tra xem user có đang cố tạo nhà mới không (nhập pass)
                           if (pass.isNotEmpty) {
                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('ID Nhà đã tồn tại! Để tham gia, vui lòng để trống mật khẩu Admin.')));
+                                SnackBar(content: Text(AppLocalizations.of(context)!.familyExistLeavePassEmpty)));
                              setStateDialog(() => _dialogLoading = false);
                              return;
                           }
@@ -217,19 +218,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           // Thêm thành viên (chỉ khi không nhập pass)
                           await _authService.addMember(fid, uname);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Đăng ký thành viên thành công. Bạn có thể đăng nhập.')),
+                            SnackBar(content: Text(AppLocalizations.of(context)!.memberRegisterSuccess)),
                           );
                         } else {
                           // Tạo nhà mới (cần mật khẩu)
                           if (pass.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Nhà chưa tồn tại, vui lòng nhập mật khẩu để tạo nhà mới.')));
+                                SnackBar(content: Text(AppLocalizations.of(context)!.familyNotExistEnterPass)));
                             setStateDialog(() => _dialogLoading = false);
                             return;
                           }
                           await _authService.registerHousehold(familyId: fid, adminUser: uname, password: pass);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Tạo nhà và tài khoản admin thành công.')),
+                            SnackBar(content: Text(AppLocalizations.of(context)!.createFamilySuccess)),
                           );
                         }
 
@@ -238,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (_familyIdController.text.trim() == fid) _checkFamilyId();
                         setStateDialog(() => _dialogLoading = false);
                       },
-                child: Text('Đăng ký'),
+                child: Text(AppLocalizations.of(context)!.register),
               ),
             ],
           );
@@ -272,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.text,
       );
       if (!isPassCorrect) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Sai mật khẩu!")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.wrongPassword)));
         return;
       }
     }
@@ -342,7 +343,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: 20),
                     Text(
-                      'Quản Lý Việc Nhà',
+                      AppLocalizations.of(context)!.appTitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 28, 
@@ -375,7 +376,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Text(
-                                  _isFamilyFound ? "Xin chào!" : "Chào mừng trở lại",
+                                  _isFamilyFound ? AppLocalizations.of(context)!.helloExclaim : AppLocalizations.of(context)!.welcomeBack,
                                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal.shade800),
                                   textAlign: TextAlign.center,
                                 ),
@@ -385,7 +386,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 TextField(
                                   controller: _familyIdController,
                                   decoration: InputDecoration(
-                                    labelText: "ID Nhà (Family ID)",
+                                    labelText: AppLocalizations.of(context)!.familyIdLabel,
                                     prefixIcon: Icon(Icons.home, color: Colors.teal),
                                     suffixIcon: IconButton(
                                       icon: Icon(Icons.search, color: Colors.teal),
@@ -404,19 +405,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                 if (!_isFamilyFound) ...[
                                   TextButton(
                                     onPressed: _isLoading ? null : _showRegisterDialog,
-                                    child: Text('Bạn chưa có tài khoản? Đăng ký ngay', 
+                                    child: Text(AppLocalizations.of(context)!.noAccountRegister, 
                                         style: TextStyle(color: Colors.teal.shade600, fontWeight: FontWeight.bold)),
                                   ),
                                 ],
 
                                 // Username Input (if family found)
                                 if (_isFamilyFound) ...[
-                                  Text('Tài khoản của bạn', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                                  Text(AppLocalizations.of(context)!.yourAccount, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
                                   SizedBox(height: 8),
                                   TextField(
                                     controller: _usernameController,
                                     decoration: InputDecoration(
-                                      labelText: 'Username',
+                                      labelText: AppLocalizations.of(context)!.usernameLabel,
                                       prefixIcon: Icon(Icons.person, color: Colors.teal),
                                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                                       filled: true,
@@ -437,7 +438,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         elevation: 4,
                                       ),
                                       child: Text(
-                                        _isLoading ? 'Đang xử lý...' : 'Tiếp tục',
+                                        _isLoading ? AppLocalizations.of(context)!.processing : AppLocalizations.of(context)!.continueBtn,
                                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                       ),
                                     ),
@@ -449,7 +450,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       controller: _passwordController,
                                       obscureText: true,
                                       decoration: InputDecoration(
-                                        labelText: 'Mật khẩu Admin',
+                                        labelText: AppLocalizations.of(context)!.adminPassLabel,
                                         prefixIcon: Icon(Icons.lock, color: Colors.orange),
                                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                                         filled: true,
@@ -469,7 +470,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               elevation: 4,
                                             ),
                                             child: Text(
-                                              _isLoading ? 'Đang xử lý...' : 'Vào Nhà',
+                                              _isLoading ? AppLocalizations.of(context)!.processing : AppLocalizations.of(context)!.enterHome,
                                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                             ),
                                           ),
@@ -501,7 +502,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Center(
                                       child: TextButton(
                                         onPressed: _isLoading ? null : _showRegisterDialog,
-                                        child: Text('Đăng ký tài khoản khác?', style: TextStyle(color: Colors.teal.shade600)),
+                                        child: Text(AppLocalizations.of(context)!.registerOtherAccount, style: TextStyle(color: Colors.teal.shade600)),
                                       ),
                                     ),
 
@@ -520,7 +521,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 _passwordController.clear();
                                               });
                                             },
-                                      child: Text('Đổi Mã Nhà', style: TextStyle(color: Colors.grey[600])),
+                                      child: Text(AppLocalizations.of(context)!.changeFamilyId, style: TextStyle(color: Colors.grey[600])),
                                     ),
                                   ),
                                 ],

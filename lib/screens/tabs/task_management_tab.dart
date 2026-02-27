@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/household_model.dart';
 import '../../services/auth_service.dart';
+import 'package:family_task_app/l10n/app_localizations.dart';
 
 class TaskManagementScreen extends StatefulWidget {
   final String familyId;
@@ -16,12 +17,14 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
   bool _isLoading = true;
 
   // --- CẬP NHẬT LẠI TÊN GỌI KỊCH BẢN Ở ĐÂY ---
-  final Map<int, String> _scenarioLabels = {
-    1: "Xoay vòng đều (Mỗi tuần đổi người)",
-    2: "Sống 1 mình", // Theo yêu cầu của bạn
-    3: "Thầu khoán (Một người làm hết tuần)",
-    5: "Theo lượt (Ai làm xong mới đến người kế)",
-  };
+  Map<int, String> _getScenarioLabels(BuildContext context) {
+    return {
+      1: AppLocalizations.of(context)!.scenarioRotate,
+      2: AppLocalizations.of(context)!.scenarioSingle,
+      3: AppLocalizations.of(context)!.scenarioContract,
+      5: AppLocalizations.of(context)!.scenarioTurnBased,
+    };
+  }
 
   @override
   void initState() {
@@ -39,16 +42,16 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
   }
 
   // Hàm lấy mô tả chi tiết để hiện bên dưới Dropdown
-  String _getScenarioDescription(int scenario) {
+  String _getScenarioDescription(BuildContext context, int scenario) {
     switch (scenario) {
       case 1:
-        return "Ví dụ: Tuần này A làm, tuần sau B làm, tuần tới C làm... cứ thế xoay vòng.";
+        return AppLocalizations.of(context)!.scenarioRotateDesc;
       case 2:
-        return "Dành cho nhà chỉ có 1 người. Việc này luôn giao cho bạn.";
+        return AppLocalizations.of(context)!.scenarioSingleDesc;
       case 3:
-        return "Chế độ 'Trực nhật': Người này sẽ làm TẤT CẢ các việc thuộc nhóm này trong cả tuần.";
+        return AppLocalizations.of(context)!.scenarioContractDesc;
       case 5:
-        return "Dùng cho việc không cố định (VD: Đổi nước). Khi A bấm 'Xong', hệ thống sẽ chỉ định B cho lần tới.";
+        return AppLocalizations.of(context)!.scenarioTurnBasedDesc;
       default:
         return "";
     }
@@ -69,7 +72,7 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                children: [
                  Icon(Icons.add_task, color: Colors.teal),
                  SizedBox(width: 10),
-                 Text("Thêm Việc Mới", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal)),
+                 Text(AppLocalizations.of(context)!.addNewTask, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal)),
                ]
             ),
             content: SingleChildScrollView(
@@ -81,8 +84,8 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                   TextField(
                     controller: _nameController,
                     decoration: InputDecoration(
-                      labelText: "Tên công việc",
-                      hintText: "VD: Đổ rác, Rửa bát...",
+                      labelText: AppLocalizations.of(context)!.taskNameLabel,
+                      hintText: AppLocalizations.of(context)!.taskNameHint,
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       prefixIcon: Icon(Icons.edit, color: Colors.teal),
                       filled: true,
@@ -92,7 +95,7 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                   SizedBox(height: 16),
 
                   // 2. Chọn kịch bản
-                  Text("Cách chia việc:", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal[800])),
+                  Text(AppLocalizations.of(context)!.taskDivisionLabel, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal[800])),
                   SizedBox(height: 8),
                   DropdownButtonFormField<int>(
                     value: _selectedScenario,
@@ -103,7 +106,7 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                       filled: true,
                       fillColor: Colors.grey[50],
                     ),
-                    items: _scenarioLabels.entries.map((entry) {
+                    items: _getScenarioLabels(context).entries.map((entry) {
                       return DropdownMenuItem(
                         value: entry.key,
                         child: Text(
@@ -134,7 +137,7 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                         SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            _getScenarioDescription(_selectedScenario),
+                            _getScenarioDescription(context, _selectedScenario),
                             style: TextStyle(fontSize: 13, color: Colors.blue[900]),
                           ),
                         ),
@@ -149,9 +152,9 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                       controller: _offsetController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: "Độ lệch người (Offset)",
+                        labelText: AppLocalizations.of(context)!.offsetLabel,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        helperText: "Nhập 1 để người làm việc này KHÁC người làm việc trước đó.",
+                        helperText: AppLocalizations.of(context)!.offsetHelperText,
                         prefixIcon: Icon(Icons.exposure_plus_1, color: Colors.teal),
                       ),
                     ),
@@ -162,7 +165,7 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text("Hủy", style: TextStyle(color: Colors.grey)),
+                child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.grey)),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -181,7 +184,7 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                     _loadTasks();
                   }
                 },
-                child: Text("Lưu Công Việc"),
+                child: Text(AppLocalizations.of(context)!.saveTask),
               ),
             ],
           );
@@ -232,7 +235,7 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                 ),
                 SizedBox(width: 16),
                 Text(
-                  "Quản Lý Công Việc",
+                  AppLocalizations.of(context)!.taskManagement,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -262,12 +265,12 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                             ),
                             SizedBox(height: 24),
                             Text(
-                              "Chưa có công việc nào",
+                              AppLocalizations.of(context)!.noTasksYet,
                               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[800]),
                             ),
                             SizedBox(height: 8),
                             Text(
-                              "Hãy bấm nút + để thêm công việc mới",
+                              AppLocalizations.of(context)!.tapPlusToAdd,
                               style: TextStyle(color: Colors.grey[600]),
                             ),
                           ],
@@ -305,7 +308,7 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                               subtitle: Padding(
                                 padding: const EdgeInsets.only(top: 4.0),
                                 child: Text(
-                                  _scenarioLabels[task.scenario] ?? "Khác",
+                                  _getScenarioLabels(context)[task.scenario] ?? AppLocalizations.of(context)!.other,
                                   style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                                 ),
                               ),
@@ -317,14 +320,14 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                                     context: context,
                                     builder: (ctx) => AlertDialog(
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                      title: Text("Xóa việc này?"),
-                                      content: Text("Bạn chắc chắn muốn xóa '${task.title}'?"),
+                                      title: Text(AppLocalizations.of(context)!.deleteThisTask),
+                                      content: Text(AppLocalizations.of(context)!.areYouSureDeleteTask(task.title)),
                                       actions: [
-                                        TextButton(onPressed: ()=>Navigator.pop(ctx, false), child: Text("Hủy", style: TextStyle(color: Colors.grey))),
+                                        TextButton(onPressed: ()=>Navigator.pop(ctx, false), child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.grey))),
                                         ElevatedButton(
                                             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                                             onPressed: ()=>Navigator.pop(ctx, true), 
-                                            child: Text("Xóa")
+                                            child: Text(AppLocalizations.of(context)!.delete)
                                         ),
                                       ],
                                     )
@@ -346,7 +349,7 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddTaskDialog,
         icon: Icon(Icons.add_task),
-        label: Text("Thêm Việc"),
+        label: Text(AppLocalizations.of(context)!.addTaskFab),
         backgroundColor: Colors.teal,
         elevation: 4,
       ),

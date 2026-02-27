@@ -19,5 +19,88 @@
   "assignedToMe": "Me",
   "assignedToOther": "Assigned to: {name}",
   "perpetualCalendar": "Perpetual Calendar",
-  "month": "Month {num}"
+  "month": "Month {num}",
+  "familyIdNotExist": "Family ID does not exist. Please register!",
+  "enterUsername": "Please enter a username",
+  "memberNotFound": "Member not found. You can register.",
+  "registerAccount": "Register Account",
+  "familyIdLabel": "Family ID",
+  "usernameLabel": "Username",
+  "passwordLabel": "Password",
+  "cancel": "Cancel",
+  "fillAllInfo": "Please fill in all information",
+  "familyExistLeavePassEmpty": "Family ID already exists! To join, leave Admin password empty.",
+  "memberRegisterSuccess": "Member registered successfully. You can log in.",
+  "familyNotExistEnterPass": "Family doesn't exist. Enter password to create a new one.",
+  "createFamilySuccess": "Family and admin account created successfully.",
+  "register": "Register",
+  "wrongPassword": "Wrong password!",
+  "appTitle": "Family Task App",
+  "helloExclaim": "Hello!",
+  "welcomeBack": "Welcome back",
+  "noAccountRegister": "Don't have an account? Register now",
+  "yourAccount": "Your account",
+  "processing": "Processing...",
+  "continueBtn": "Continue",
+  "adminPassLabel": "Admin Password",
+  "enterHome": "Enter Home",
+  "registerOtherAccount": "Register another account?",
+  "changeFamilyId": "Change Family ID",
+  "loadingData": "Loading data...",
+  "scenarioRotate": "Equal rotation (Change weekly)",
+  "scenarioSingle": "Living alone",
+  "scenarioContract": "Contract (One person does it all week)",
+  "scenarioTurnBased": "Turn-based (Next person starts after completion)",
+  "scenarioRotateDesc": "Example: A does it this week, B next week, C the week after... rotating.",
+  "scenarioSingleDesc": "For single-person households. This task is always yours.",
+  "scenarioContractDesc": "'Duty' mode: This person does ALL tasks in this group for the whole week.",
+  "scenarioTurnBasedDesc": "For non-fixed tasks (e.g., changing water). When A clicks 'Done', the system assigns it to B next time.",
+  "addNewTask": "Add New Task",
+  "taskNameLabel": "Task Name",
+  "taskNameHint": "E.g.: Take out trash, Wash dishes...",
+  "taskDivisionLabel": "Task division:",
+  "offsetLabel": "Person Offset",
+  "offsetHelperText": "Enter 1 so the assigned person is DIFFERENT from the previous one.",
+  "saveTask": "Save Task",
+  "taskManagement": "Task Management",
+  "noTasksYet": "No tasks yet",
+  "tapPlusToAdd": "Tap the + button to add a new task",
+  "deleteThisTask": "Delete this task?",
+  "areYouSureDeleteTask": "Are you sure you want to delete '{title}'?",
+  "@areYouSureDeleteTask": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "delete": "Delete",
+  "other": "Other",
+  "addTaskFab": "Add Task",
+  "addMember": "Add Member",
+  "memberNameLabel": "Member Name",
+  "memberNameHint": "E.g.: John",
+  "add": "Add",
+  "addedMemberToFamily": "Added {name} to the family!",
+  "@addedMemberToFamily": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cannotDeleteAdmin": "Cannot delete Admin!",
+  "confirmDelete": "Confirm Deletion",
+  "areYouSureDeleteMember": "Are you sure you want to remove {name} from the family?",
+  "@areYouSureDeleteMember": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "membersTab": "Members",
+  "headOfHousehold": "Head of Household (Admin)",
+  "regularMember": "Member",
+  "addMemberFab": "Add Member"
 }

@@ -4,7 +4,7 @@ import 'firebase_options.dart';
 import 'screens/splash_screen.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:family_task_app/l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

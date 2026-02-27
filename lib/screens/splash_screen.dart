@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/household_model.dart';
 import 'dashboard_screen.dart';
 import 'login_screen.dart';
+import 'package:family_task_app/l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -59,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
             SizedBox(height: 20),
             CircularProgressIndicator(), // Vòng tròn xoay xoay loading
             SizedBox(height: 20),
-            Text("Đang tải dữ liệu...", style: TextStyle(color: Colors.grey)),
+            Text(AppLocalizations.of(context)?.loadingData ?? "Đang tải dữ liệu...", style: TextStyle(color: Colors.grey)),
           ],
         ),
       ),

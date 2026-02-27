@@ -47,5 +47,88 @@
         "type": "int"
       }
     }
-  }
+  },
+  "familyIdNotExist": "Mã nhà chưa tồn tại. Hãy đăng ký mới!",
+  "enterUsername": "Vui lòng nhập username",
+  "memberNotFound": "Không tìm thấy thành viên. Bạn có thể đăng ký.",
+  "registerAccount": "Đăng ký tài khoản",
+  "familyIdLabel": "ID nhà (Family ID)",
+  "usernameLabel": "Username",
+  "passwordLabel": "Mật khẩu",
+  "cancel": "Huỷ",
+  "fillAllInfo": "Vui lòng điền đủ thông tin",
+  "familyExistLeavePassEmpty": "ID Nhà đã tồn tại! Để tham gia, vui lòng để trống mật khẩu Admin.",
+  "memberRegisterSuccess": "Đăng ký thành viên thành công. Bạn có thể đăng nhập.",
+  "familyNotExistEnterPass": "Nhà chưa tồn tại, vui lòng nhập mật khẩu để tạo nhà mới.",
+  "createFamilySuccess": "Tạo nhà và tài khoản admin thành công.",
+  "register": "Đăng ký",
+  "wrongPassword": "Sai mật khẩu!",
+  "appTitle": "Quản Lý Việc Nhà",
+  "helloExclaim": "Xin chào!",
+  "welcomeBack": "Chào mừng trở lại",
+  "noAccountRegister": "Bạn chưa có tài khoản? Đăng ký ngay",
+  "yourAccount": "Tài khoản của bạn",
+  "processing": "Đang xử lý...",
+  "continueBtn": "Tiếp tục",
+  "adminPassLabel": "Mật khẩu Admin",
+  "enterHome": "Vào Nhà",
+  "registerOtherAccount": "Đăng ký tài khoản khác?",
+  "changeFamilyId": "Đổi Mã Nhà",
+  "loadingData": "Đang tải dữ liệu...",
+  "scenarioRotate": "Xoay vòng đều (Mỗi tuần đổi người)",
+  "scenarioSingle": "Sống 1 mình",
+  "scenarioContract": "Thầu khoán (Một người làm hết tuần)",
+  "scenarioTurnBased": "Theo lượt (Ai làm xong mới đến người kế)",
+  "scenarioRotateDesc": "Ví dụ: Tuần này A làm, tuần sau B làm, tuần tới C làm... cứ thế xoay vòng.",
+  "scenarioSingleDesc": "Dành cho nhà chỉ có 1 người. Việc này luôn giao cho bạn.",
+  "scenarioContractDesc": "Chế độ 'Trực nhật': Người này sẽ làm TẤT CẢ các việc thuộc nhóm này trong cả tuần.",
+  "scenarioTurnBasedDesc": "Dùng cho việc không cố định (VD: Đổi nước). Khi A bấm 'Xong', hệ thống sẽ chỉ định B cho lần tới.",
+  "addNewTask": "Thêm Việc Mới",
+  "taskNameLabel": "Tên công việc",
+  "taskNameHint": "VD: Đổ rác, Rửa bát...",
+  "taskDivisionLabel": "Cách chia việc:",
+  "offsetLabel": "Độ lệch người (Offset)",
+  "offsetHelperText": "Nhập 1 để người làm việc này KHÁC người làm việc trước đó.",
+  "saveTask": "Lưu Công Việc",
+  "taskManagement": "Quản Lý Công Việc",
+  "noTasksYet": "Chưa có công việc nào",
+  "tapPlusToAdd": "Hãy bấm nút + để thêm công việc mới",
+  "deleteThisTask": "Xóa việc này?",
+  "areYouSureDeleteTask": "Bạn chắc chắn muốn xóa '{title}'?",
+  "@areYouSureDeleteTask": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "delete": "Xóa",
+  "other": "Khác",
+  "addTaskFab": "Thêm Việc",
+  "addMember": "Thêm thành viên",
+  "memberNameLabel": "Tên thành viên",
+  "memberNameHint": "Ví dụ: Bình",
+  "add": "Thêm",
+  "addedMemberToFamily": "Đã thêm {name} vào nhà!",
+  "@addedMemberToFamily": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cannotDeleteAdmin": "Không thể xóa Admin!",
+  "confirmDelete": "Xác nhận xóa",
+  "areYouSureDeleteMember": "Bạn có chắc muốn xóa {name} khỏi nhà không?",
+  "@areYouSureDeleteMember": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "membersTab": "Thành Viên",
+  "headOfHousehold": "Chủ hộ (Admin)",
+  "regularMember": "Thành viên",
+  "addMemberFab": "Thêm Thành Viên"
 }
