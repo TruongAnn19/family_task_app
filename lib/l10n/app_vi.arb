@@ -1,0 +1,51 @@
+{
+  "@@locale": "vi",
+
+  "hello": "Xin chào,",
+  "familyId": "ID nhà: {id}",
+  "@familyId": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "members": "Thành viên",
+  "tasks": "Công việc",
+  "todoTasks": "🎯 Việc cần làm",
+  "familyStatus": "🏠 Tình trạng cả nhà",
+  "weekNum": "Tuần {num}",
+  "@weekNum": {
+    "placeholders": {
+      "num": {
+        "type": "String"
+      }
+    }
+  },
+  "viewCalendarAndEvents": "Xem lịch & Sự kiện",
+  "completedAllTasks": "Bạn đã hoàn thành hết việc! 🎉",
+  "swapTaskTooltip": "Đổi việc này",
+  "cancelRequest": "Hủy yêu cầu",
+  "requestAccepted": "Đã được chấp nhận",
+  "taskCompleted": "Đã hoàn thành",
+  "taskIncomplete": "Chưa hoàn thành",
+  "assignedToYou": "Bạn",
+  "assignedToMe": "Tôi",
+  "assignedToOther": "Phụ trách: {name}",
+  "@assignedToOther": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "perpetualCalendar": "Lịch Vạn Niên",
+  "month": "Tháng {num}",
+  "@month": {
+    "placeholders": {
+      "num": {
+        "type": "int"
+      }
+    }
+  }
+}

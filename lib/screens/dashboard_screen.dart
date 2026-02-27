@@ -18,6 +18,7 @@ import '../models/calendar_event_model.dart';
 import '../services/calendar_service.dart';
 import '../services/notification_service.dart';
 import '../models/swap_request_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String familyId;
@@ -158,7 +159,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                           // PHẦN 1: VIỆC CỦA TÔI
                           Text(
-                            "🎯 Việc cần làm",
+                            AppLocalizations.of(context)!.todoTasks,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -172,7 +173,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                           // PHẦN 2: TÌNH TRẠNG CHUNG
                           Text(
-                            "🏠 Tình trạng cả nhà",
+                            AppLocalizations.of(context)!.familyStatus,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -220,7 +221,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Xin chào,",
+                  AppLocalizations.of(context)!.hello,
                   style: TextStyle(color: Colors.teal.shade100, fontSize: 16),
                 ),
                 SizedBox(height: 4),
@@ -248,7 +249,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       SizedBox(width: 4),
                       Flexible(
                         child: Text(
-                          "ID nhà: ${widget.familyId}",
+                          AppLocalizations.of(context)!.familyId(widget.familyId),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -305,7 +306,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           children: [
                             Icon(Icons.people, color: Colors.blue),
                             SizedBox(width: 8),
-                            Text("Thành viên"),
+                            Text(AppLocalizations.of(context)!.members),
                           ],
                         ),
                       ),
@@ -315,7 +316,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           children: [
                             Icon(Icons.list_alt, color: Colors.green),
                             SizedBox(width: 8),
-                            Text("Công việc"),
+                            Text(AppLocalizations.of(context)!.tasks),
                           ],
                         ),
                       ),
@@ -380,7 +381,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Tuần ${_schedule?.weekId.split('_W')[1] ?? '...'}",
+                    AppLocalizations.of(context)!.weekNum(_schedule?.weekId.split('_W')[1] ?? '...'),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -388,7 +389,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   Text(
-                    "Xem lịch & Sự kiện",
+                    AppLocalizations.of(context)!.viewCalendarAndEvents,
                     style: TextStyle(color: Colors.grey[600], fontSize: 13),
                   ),
                 ],
@@ -485,7 +486,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             SizedBox(height: 12),
             Text(
-              "Bạn đã hoàn thành hết việc! 🎉",
+              AppLocalizations.of(context)!.completedAllTasks,
               style: TextStyle(color: Colors.grey[600]),
             ),
           ],
@@ -505,14 +506,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         } else if (request == null || request.status == 'rejected') {
           tailWidget = IconButton(
             icon: Icon(Icons.swap_horiz, color: Colors.blue.shade300),
-            tooltip: "Đổi việc này",
+            tooltip: AppLocalizations.of(context)!.swapTaskTooltip,
             onPressed: () => _showSwapDialog(task),
           );
         } else if (request.status == 'pending') {
           tailWidget = TextButton.icon(
             icon: Icon(Icons.close, size: 16, color: Colors.red),
             label: Text(
-              "Hủy yêu cầu",
+              AppLocalizations.of(context)!.cancelRequest,
               style: TextStyle(color: Colors.red, fontSize: 12),
             ),
             onPressed: () async {
@@ -527,7 +528,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              "Đã được chấp nhận",
+              AppLocalizations.of(context)!.requestAccepted,
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.green,
@@ -586,7 +587,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        task.isDone ? "Đã hoàn thành" : "Chưa hoàn thành",
+                        task.isDone ? AppLocalizations.of(context)!.taskCompleted : AppLocalizations.of(context)!.taskIncomplete,
                         style: TextStyle(
                           color: task.isDone ? Colors.green : Colors.orange,
                           fontSize: 12,
@@ -647,7 +648,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             subtitle: Text(
-              "Phụ trách: ${isMe ? 'Bạn' : task.assignedTo}",
+              AppLocalizations.of(context)!.assignedToOther(isMe ? AppLocalizations.of(context)!.assignedToYou : task.assignedTo),
               style: TextStyle(
                 fontSize: 13,
                 color: isMe ? Colors.teal : Colors.grey[600],
@@ -661,7 +662,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      "Tôi",
+                      AppLocalizations.of(context)!.assignedToMe,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.teal,
@@ -774,7 +775,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         stops: useRedTheme ? [0.0, 1.0] : [0.0, 0.5, 1.0],
                                       ).createShader(bounds),
                                       child: Text(
-                                        "Lịch Vạn Niên",
+                                        AppLocalizations.of(context)!.perpetualCalendar,
                                         style: CalendarStyleHelper.calendarTitleStyle(activeColor),
                                       ),
                                     ),

@@ -1,0 +1,23 @@
+{
+  "@@locale": "en",
+
+  "hello": "Hello,",
+  "familyId": "Family ID: {id}",
+  "members": "Members",
+  "tasks": "Tasks",
+  "todoTasks": "🎯 To-do Tasks",
+  "familyStatus": "🏠 Family Status",
+  "weekNum": "Week {num}",
+  "viewCalendarAndEvents": "Calendar & Events",
+  "completedAllTasks": "You have completed all tasks! 🎉",
+  "swapTaskTooltip": "Swap this task",
+  "cancelRequest": "Cancel request",
+  "requestAccepted": "Accepted",
+  "taskCompleted": "Completed",
+  "taskIncomplete": "Incomplete",
+  "assignedToYou": "You",
+  "assignedToMe": "Me",
+  "assignedToOther": "Assigned to: {name}",
+  "perpetualCalendar": "Perpetual Calendar",
+  "month": "Month {num}"
+}
