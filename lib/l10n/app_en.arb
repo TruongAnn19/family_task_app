@@ -102,5 +102,6 @@
   "membersTab": "Members",
   "headOfHousehold": "Head of Household (Admin)",
   "regularMember": "Member",
-  "addMemberFab": "Add Member"
+  "addMemberFab": "Add Member",
+  "switchLanguage": "Switch Language"
 }

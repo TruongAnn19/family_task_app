@@ -50,10 +50,10 @@ class AuthService {
   Future<bool> verifyAdmin(String familyId, String password) async {
     final doc = await _db.collection('Households').doc(familyId).get();
     if (!doc.exists) return false;
-    
+
     String storedPassword = doc.data()?['admin_password'];
     String hashedPassword = _hashPassword(password);
-    
+
     // Check hash match OR fallback match (plain text) to avoid full block
     return storedPassword == hashedPassword || storedPassword == password;
   }
@@ -112,17 +112,23 @@ class AuthService {
   }
 
   // Cập nhật Device Token cho thành viên
-  Future<void> updateMemberToken(String familyId, String memberName, String token) async {
+  Future<void> updateMemberToken(
+    String familyId,
+    String memberName,
+    String token,
+  ) async {
     final docRef = _db.collection('Households').doc(familyId);
-    
-    // Firestore hơi khó update 1 phần tử trong mảng. 
+
+    // Firestore hơi khó update 1 phần tử trong mảng.
     // Cách an toàn: Lấy về -> Sửa -> Lưu đè.
     _db.runTransaction((transaction) async {
       DocumentSnapshot snapshot = await transaction.get(docRef);
       if (!snapshot.exists) return;
 
-      Household house = Household.fromFirestore(snapshot.data() as Map<String, dynamic>);
-      
+      Household house = Household.fromFirestore(
+        snapshot.data() as Map<String, dynamic>,
+      );
+
       // Tìm và update token
       List<Member> updatedMembers = house.members.map((m) {
         if (m.name == memberName) {
@@ -132,7 +138,7 @@ class AuthService {
       }).toList();
 
       transaction.update(docRef, {
-        'members': updatedMembers.map((e) => e.toJson()).toList()
+        'members': updatedMembers.map((e) => e.toJson()).toList(),
       });
     });
   }

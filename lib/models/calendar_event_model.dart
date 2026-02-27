@@ -31,7 +31,9 @@ class CalendarEvent {
       'familyId': familyId,
       'createdBy': createdBy,
       'hasReminder': hasReminder,
-      'reminderTime': reminderTime != null ? Timestamp.fromDate(reminderTime!) : null,
+      'reminderTime': reminderTime != null
+          ? Timestamp.fromDate(reminderTime!)
+          : null,
     };
   }
 
@@ -46,7 +48,9 @@ class CalendarEvent {
       familyId: data['familyId'] ?? '',
       createdBy: data['createdBy'] ?? '',
       hasReminder: data['hasReminder'] ?? false,
-      reminderTime: data['reminderTime'] != null ? (data['reminderTime'] as Timestamp).toDate() : null,
+      reminderTime: data['reminderTime'] != null
+          ? (data['reminderTime'] as Timestamp).toDate()
+          : null,
     );
   }
 }

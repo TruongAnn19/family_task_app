@@ -29,14 +29,12 @@ class _SplashScreenState extends State<SplashScreen> {
     if (familyId != null && username != null) {
       // Đã từng đăng nhập -> Tái tạo object Member -> Vào thẳng Dashboard
       Member savedUser = Member(name: username, isAdmin: isAdmin ?? false);
-      
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => DashboardScreen(
-            familyId: familyId, 
-            currentUser: savedUser
-          ),
+          builder: (_) =>
+              DashboardScreen(familyId: familyId, currentUser: savedUser),
         ),
       );
     } else {
@@ -60,7 +58,11 @@ class _SplashScreenState extends State<SplashScreen> {
             SizedBox(height: 20),
             CircularProgressIndicator(), // Vòng tròn xoay xoay loading
             SizedBox(height: 20),
-            Text(AppLocalizations.of(context)?.loadingData ?? "Đang tải dữ liệu...", style: TextStyle(color: Colors.grey)),
+            Text(
+              AppLocalizations.of(context)?.loadingData ??
+                  "Đang tải dữ liệu...",
+              style: TextStyle(color: Colors.grey),
+            ),
           ],
         ),
       ),

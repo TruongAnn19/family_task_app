@@ -4,11 +4,13 @@ import 'dart:math';
 /// Helper class for Calendar UI Styling — Zen Modernity Theme
 class CalendarStyleHelper {
   // === COLORS ===
-  static const Color primaryColor = Color(0xFF2E5C55);     // Jade Green (Ngọc Bích)
-  static const Color accentColor = Color(0xFFC5A059);      // Antique Gold (Vàng Cổ)
-  static const Color goldShimmer = Color(0xFFD4AF37);      // Gold Shimmer
-  static const Color backgroundColor = Color(0xFFF7F5F0);  // Warm Paper (Giấy Dó)
-  static const Color lunarTextColor = Color(0xFF718096);    // Slate Grey
+  static const Color primaryColor = Color(0xFF2E5C55); // Jade Green (Ngọc Bích)
+  static const Color accentColor = Color(0xFFC5A059); // Antique Gold (Vàng Cổ)
+  static const Color goldShimmer = Color(0xFFD4AF37); // Gold Shimmer
+  static const Color backgroundColor = Color(
+    0xFFF7F5F0,
+  ); // Warm Paper (Giấy Dó)
+  static const Color lunarTextColor = Color(0xFF718096); // Slate Grey
   static const Color eventMarkerColor = Color(0xFFE53935); // Imperial Red
 
   // === SHADOWS ===
@@ -33,16 +35,19 @@ class CalendarStyleHelper {
   static const Color tetRed = Color(0xFFD32F2F);
   static const Color tetGold = Color(0xFFFFD700);
   static const List<Color> tetGradient = [Color(0xFFD32F2F), Color(0xFFFFC107)];
-  static const List<Color> tetBackgroundGradient = [Color(0xFFFFF5F5), Color(0xFFFFEBEE)]; // Nền đỏ rất nhạt
+  static const List<Color> tetBackgroundGradient = [
+    Color(0xFFFFF5F5),
+    Color(0xFFFFEBEE),
+  ]; // Nền đỏ rất nhạt
 
   // --- SHADOWS ---
   static List<BoxShadow> get defaultShadow => [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.05),
-          blurRadius: 10,
-          offset: Offset(0, 4),
-        ),
-      ];
+    BoxShadow(
+      color: Colors.black.withOpacity(0.05),
+      blurRadius: 10,
+      offset: Offset(0, 4),
+    ),
+  ];
 
   static List<BoxShadow> elevatedShadow = [
     BoxShadow(
@@ -73,10 +78,7 @@ class CalendarStyleHelper {
     gradient: LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [
-        Color(0xFFFDFCFB),
-        Color(0xFFF7F5F0),
-      ],
+      colors: [Color(0xFFFDFCFB), Color(0xFFF7F5F0)],
     ),
   );
 
@@ -121,7 +123,7 @@ class CalendarStyleHelper {
   );
 
   // === TEXT STYLES ===
-  
+
   /// Title text "Lịch Vạn Niên" — thư pháp sang trọng
   static TextStyle calendarTitleStyle(Color zodiacColor) {
     return TextStyle(
@@ -136,11 +138,7 @@ class CalendarStyleHelper {
           offset: Offset(1, 2),
           blurRadius: 4,
         ),
-        Shadow(
-          color: Colors.black12,
-          offset: Offset(0, 1),
-          blurRadius: 2,
-        ),
+        Shadow(color: Colors.black12, offset: Offset(0, 1), blurRadius: 2),
       ],
     );
   }
@@ -163,15 +161,19 @@ class CalendarStyleHelper {
   );
 
   /// Solar date style (ngày dương) — To, đậm, rõ ràng
-  static TextStyle solarDateStyle(bool isSelected, bool isToday, bool isWeekend) {
+  static TextStyle solarDateStyle(
+    bool isSelected,
+    bool isToday,
+    bool isWeekend,
+  ) {
     return TextStyle(
       fontSize: 17,
       fontWeight: FontWeight.w800,
       color: isSelected
           ? Colors.white
           : (isToday
-              ? primaryColor
-              : (isWeekend ? Color(0xFFD32F2F) : Color(0xFF263238))),
+                ? primaryColor
+                : (isWeekend ? Color(0xFFD32F2F) : Color(0xFF263238))),
     );
   }
 
@@ -212,10 +214,7 @@ class CalendarStyleHelper {
     return BoxDecoration(
       color: zodiacGradient[1].withOpacity(0.12),
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(
-        color: zodiacGradient[0].withOpacity(0.6),
-        width: 2,
-      ),
+      border: Border.all(color: zodiacGradient[0].withOpacity(0.6), width: 2),
     );
   }
 
@@ -232,10 +231,7 @@ class CalendarStyleHelper {
     return BoxDecoration(
       color: Color(0xFFFFF3E0).withOpacity(0.5),
       borderRadius: BorderRadius.circular(10),
-      border: Border.all(
-        color: Color(0xFFE53935).withOpacity(0.15),
-        width: 1,
-      ),
+      border: Border.all(color: Color(0xFFE53935).withOpacity(0.15), width: 1),
     );
   }
 
@@ -274,17 +270,17 @@ class CalendarStyleHelper {
         ],
       ),
       borderRadius: BorderRadius.circular(14),
-      border: Border.all(
-        color: Color(0xFFE53935).withOpacity(0.2),
-        width: 1,
-      ),
+      border: Border.all(color: Color(0xFFE53935).withOpacity(0.2), width: 1),
     );
   }
 
   // === WIDGETS ===
 
   /// Widget trang trí góc (Corner Ornament) — Mây/Hoa
-  static Widget buildCornerOrnament(bool isTopLeft, {List<Color>? zodiacGradient}) {
+  static Widget buildCornerOrnament(
+    bool isTopLeft, {
+    List<Color>? zodiacGradient,
+  }) {
     final color = zodiacGradient != null ? zodiacGradient[0] : accentColor;
     return Positioned(
       top: isTopLeft ? -15 : null,
@@ -295,10 +291,7 @@ class CalendarStyleHelper {
         opacity: 0.06,
         child: CustomPaint(
           size: Size(120, 120),
-          painter: _LotusOrnamentPainter(
-            color: color,
-            isTopLeft: isTopLeft,
-          ),
+          painter: _LotusOrnamentPainter(color: color, isTopLeft: isTopLeft),
         ),
       ),
     );
@@ -358,10 +351,7 @@ class CalendarStyleHelper {
       height: 6,
       decoration: BoxDecoration(
         gradient: RadialGradient(
-          colors: [
-            eventMarkerColor,
-            eventMarkerColor.withOpacity(0.6),
-          ],
+          colors: [eventMarkerColor, eventMarkerColor.withOpacity(0.6)],
         ),
         shape: BoxShape.circle,
         boxShadow: [
@@ -381,15 +371,10 @@ class CalendarStyleHelper {
       width: 5,
       height: 5,
       decoration: BoxDecoration(
-        gradient: RadialGradient(
-          colors: [goldShimmer, accentColor],
-        ),
+        gradient: RadialGradient(colors: [goldShimmer, accentColor]),
         shape: BoxShape.circle,
         boxShadow: [
-          BoxShadow(
-            color: goldShimmer.withOpacity(0.5),
-            blurRadius: 2,
-          ),
+          BoxShadow(color: goldShimmer.withOpacity(0.5), blurRadius: 2),
         ],
       ),
     );
@@ -449,9 +434,9 @@ class _LotusOrnamentPainter extends CustomPainter {
     for (int i = 0; i < 8; i++) {
       final angle = (i * pi / 4);
       final petalPath = Path();
-      
+
       petalPath.moveTo(center.dx, center.dy);
-      
+
       final controlX1 = center.dx + cos(angle - 0.3) * size.width * 0.35;
       final controlY1 = center.dy + sin(angle - 0.3) * size.height * 0.35;
       final controlX2 = center.dx + cos(angle + 0.3) * size.width * 0.35;

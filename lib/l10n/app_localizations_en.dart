@@ -274,4 +274,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addMemberFab => 'Add Member';
+
+  @override
+  String get switchLanguage => 'Switch Language';
 }

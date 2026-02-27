@@ -38,7 +38,7 @@ dependencies:
   # --- CÁC GÓI KHÁC ---
   shared_preferences: ^2.3.2
   intl: ^0.20.2
-  provider: ^6.1.2
+  provider: ^6.1.5+1
   
   # --- NOTIFICATION (Dùng bản mới nhất luôn) ---
   flutter_local_notifications: ^17.2.4 # Hoặc ^18.0.0 tuỳ bạn, nhưng bộ này đi với nhau ok

@@ -583,6 +583,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Thêm Thành Viên'**
   String get addMemberFab;
+
+  /// No description provided for @switchLanguage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi Ngôn Ngữ'**
+  String get switchLanguage;
 }
 
 class _AppLocalizationsDelegate

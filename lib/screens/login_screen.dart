@@ -5,12 +5,14 @@ import '../models/household_model.dart';
 import '../screens/dashboard_screen.dart';
 import '../services/notification_service.dart';
 import 'package:family_task_app/l10n/app_localizations.dart';
+import '../widgets/language_picker.dart';
 
 class LoginScreen extends StatefulWidget {
   final AuthService? authService;
   final Function(String familyId, Member member)? onLoginSuccess;
 
-  LoginScreen({Key? key, this.authService, this.onLoginSuccess}) : super(key: key);
+  LoginScreen({Key? key, this.authService, this.onLoginSuccess})
+    : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -38,8 +40,6 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {});
     });
   }
-
-
 
   @override
   void dispose() {
@@ -91,7 +91,9 @@ class _LoginScreenState extends State<LoginScreen> {
     // Tìm user trong danh sách members đã load
     Member? found;
     try {
-      found = _members.firstWhere((m) => m.name.toLowerCase() == username.toLowerCase());
+      found = _members.firstWhere(
+        (m) => m.name.toLowerCase() == username.toLowerCase(),
+      );
     } catch (e) {
       found = null;
     }
@@ -126,124 +128,185 @@ class _LoginScreenState extends State<LoginScreen> {
     showDialog(
       context: context,
       builder: (ctx) {
-        final TextEditingController _dFamilyController = TextEditingController(text: _familyIdController.text);
+        final TextEditingController _dFamilyController = TextEditingController(
+          text: _familyIdController.text,
+        );
         final TextEditingController _dUserController = TextEditingController();
         final TextEditingController _dPassController = TextEditingController();
         bool _dialogLoading = false;
 
-        return StatefulBuilder(builder: (ctx, setStateDialog) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: Column(
-              children: [
-                Icon(Icons.person_add, size: 50, color: Colors.teal),
-                SizedBox(height: 10),
-                Text(AppLocalizations.of(context)!.registerAccount, style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold)),
-              ],
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+        return StatefulBuilder(
+          builder: (ctx, setStateDialog) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: Column(
                 children: [
-                  TextField(
-                    controller: _dFamilyController,
-                    decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.familyIdLabel,
-                        prefixIcon: Icon(Icons.home),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        filled: true,
-                        fillColor: Colors.grey[100]
+                  Icon(Icons.person_add, size: 50, color: Colors.teal),
+                  SizedBox(height: 10),
+                  Text(
+                    AppLocalizations.of(context)!.registerAccount,
+                    style: TextStyle(
+                      color: Colors.teal,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  SizedBox(height: 12),
-                  TextField(
-                    controller: _dUserController,
-                    decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.usernameLabel,
-                        prefixIcon: Icon(Icons.person),
-                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        filled: true,
-                        fillColor: Colors.grey[100]
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  TextField(
-                    controller: _dPassController,
-                    decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.passwordLabel,
-                        prefixIcon: Icon(Icons.lock),
-                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        filled: true,
-                        fillColor: Colors.grey[100]
-                    ),
-                    obscureText: true,
                   ),
                 ],
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.grey)),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: _dFamilyController,
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.familyIdLabel,
+                        prefixIcon: Icon(Icons.home),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    TextField(
+                      controller: _dUserController,
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.usernameLabel,
+                        prefixIcon: Icon(Icons.person),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    TextField(
+                      controller: _dPassController,
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.passwordLabel,
+                        prefixIcon: Icon(Icons.lock),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                      ),
+                      obscureText: true,
+                    ),
+                  ],
                 ),
-                onPressed: _dialogLoading
-                    ? null
-                    : () async {
-                        setStateDialog(() => _dialogLoading = true);
-                        String fid = _dFamilyController.text.trim();
-                        String uname = _dUserController.text.trim();
-                        String pass = _dPassController.text;
-                        if (fid.isEmpty || uname.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(AppLocalizations.of(context)!.fillAllInfo)));
-                          setStateDialog(() => _dialogLoading = false);
-                          return;
-                        }
-
-                        bool exists = await _authService.checkFamilyExists(fid);
-                        if (exists) {
-                          // Nếu nhà đã có -> kiểm tra xem user có đang cố tạo nhà mới không (nhập pass)
-                          if (pass.isNotEmpty) {
-                             ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(AppLocalizations.of(context)!.familyExistLeavePassEmpty)));
-                             setStateDialog(() => _dialogLoading = false);
-                             return;
-                          }
-
-                          // Thêm thành viên (chỉ khi không nhập pass)
-                          await _authService.addMember(fid, uname);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(AppLocalizations.of(context)!.memberRegisterSuccess)),
-                          );
-                        } else {
-                          // Tạo nhà mới (cần mật khẩu)
-                          if (pass.isEmpty) {
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(
+                    AppLocalizations.of(context)!.cancel,
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: _dialogLoading
+                      ? null
+                      : () async {
+                          setStateDialog(() => _dialogLoading = true);
+                          String fid = _dFamilyController.text.trim();
+                          String uname = _dUserController.text.trim();
+                          String pass = _dPassController.text;
+                          if (fid.isEmpty || uname.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(AppLocalizations.of(context)!.familyNotExistEnterPass)));
+                              SnackBar(
+                                content: Text(
+                                  AppLocalizations.of(context)!.fillAllInfo,
+                                ),
+                              ),
+                            );
                             setStateDialog(() => _dialogLoading = false);
                             return;
                           }
-                          await _authService.registerHousehold(familyId: fid, adminUser: uname, password: pass);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(AppLocalizations.of(context)!.createFamilySuccess)),
-                          );
-                        }
 
-                        Navigator.of(ctx).pop();
-                        // Nếu user vừa thao tác đúng family hiện tại thì refresh
-                        if (_familyIdController.text.trim() == fid) _checkFamilyId();
-                        setStateDialog(() => _dialogLoading = false);
-                      },
-                child: Text(AppLocalizations.of(context)!.register),
-              ),
-            ],
-          );
-        });
+                          bool exists = await _authService.checkFamilyExists(
+                            fid,
+                          );
+                          if (exists) {
+                            // Nếu nhà đã có -> kiểm tra xem user có đang cố tạo nhà mới không (nhập pass)
+                            if (pass.isNotEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.familyExistLeavePassEmpty,
+                                  ),
+                                ),
+                              );
+                              setStateDialog(() => _dialogLoading = false);
+                              return;
+                            }
+
+                            // Thêm thành viên (chỉ khi không nhập pass)
+                            await _authService.addMember(fid, uname);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.memberRegisterSuccess,
+                                ),
+                              ),
+                            );
+                          } else {
+                            // Tạo nhà mới (cần mật khẩu)
+                            if (pass.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.familyNotExistEnterPass,
+                                  ),
+                                ),
+                              );
+                              setStateDialog(() => _dialogLoading = false);
+                              return;
+                            }
+                            await _authService.registerHousehold(
+                              familyId: fid,
+                              adminUser: uname,
+                              password: pass,
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.createFamilySuccess,
+                                ),
+                              ),
+                            );
+                          }
+
+                          Navigator.of(ctx).pop();
+                          // Nếu user vừa thao tác đúng family hiện tại thì refresh
+                          if (_familyIdController.text.trim() == fid)
+                            _checkFamilyId();
+                          setStateDialog(() => _dialogLoading = false);
+                        },
+                  child: Text(AppLocalizations.of(context)!.register),
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }
@@ -273,7 +336,9 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.text,
       );
       if (!isPassCorrect) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.wrongPassword)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.wrongPassword)),
+        );
         return;
       }
     }
@@ -318,17 +383,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       // Remove AppBar for full screen design
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.teal.shade800, Colors.teal.shade400],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.teal.shade800, Colors.teal.shade400],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
               padding: EdgeInsets.all(24),
               child: ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: 500),
@@ -336,27 +403,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // New Icon
-                    Icon(
-                      Icons.family_restroom, 
-                      size: 100, 
-                      color: Colors.white
-                    ),
+                    Icon(Icons.family_restroom, size: 100, color: Colors.white),
                     SizedBox(height: 20),
                     Text(
                       AppLocalizations.of(context)!.appTitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 28, 
-                        fontWeight: FontWeight.bold, 
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        shadows: [Shadow(color: Colors.black26, offset: Offset(2, 2), blurRadius: 4)]
+                        shadows: [
+                          Shadow(
+                            color: Colors.black26,
+                            offset: Offset(2, 2),
+                            blurRadius: 4,
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(height: 40),
 
                     // Login Card
                     Card(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
                       elevation: 16,
                       shadowColor: Colors.black45,
                       child: Stack(
@@ -371,28 +442,53 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 32,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Text(
-                                  _isFamilyFound ? AppLocalizations.of(context)!.helloExclaim : AppLocalizations.of(context)!.welcomeBack,
-                                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal.shade800),
+                                  _isFamilyFound
+                                      ? AppLocalizations.of(
+                                          context,
+                                        )!.helloExclaim
+                                      : AppLocalizations.of(
+                                          context,
+                                        )!.welcomeBack,
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.teal.shade800,
+                                  ),
                                   textAlign: TextAlign.center,
                                 ),
                                 SizedBox(height: 20),
-                                
+
                                 // Family ID Input
                                 TextField(
                                   controller: _familyIdController,
                                   decoration: InputDecoration(
-                                    labelText: AppLocalizations.of(context)!.familyIdLabel,
-                                    prefixIcon: Icon(Icons.home, color: Colors.teal),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(Icons.search, color: Colors.teal),
-                                      onPressed: _isLoading ? null : _checkFamilyId,
+                                    labelText: AppLocalizations.of(
+                                      context,
+                                    )!.familyIdLabel,
+                                    prefixIcon: Icon(
+                                      Icons.home,
+                                      color: Colors.teal,
                                     ),
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        Icons.search,
+                                        color: Colors.teal,
+                                      ),
+                                      onPressed: _isLoading
+                                          ? null
+                                          : _checkFamilyId,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                     filled: true,
                                     fillColor: Colors.grey[50],
                                   ),
@@ -401,45 +497,84 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                 SizedBox(height: 16),
 
-                                 // Register Button (if family not found)
+                                // Register Button (if family not found)
                                 if (!_isFamilyFound) ...[
                                   TextButton(
-                                    onPressed: _isLoading ? null : _showRegisterDialog,
-                                    child: Text(AppLocalizations.of(context)!.noAccountRegister, 
-                                        style: TextStyle(color: Colors.teal.shade600, fontWeight: FontWeight.bold)),
+                                    onPressed: _isLoading
+                                        ? null
+                                        : _showRegisterDialog,
+                                    child: Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.noAccountRegister,
+                                      style: TextStyle(
+                                        color: Colors.teal.shade600,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 ],
 
                                 // Username Input (if family found)
                                 if (_isFamilyFound) ...[
-                                  Text(AppLocalizations.of(context)!.yourAccount, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                                  Text(
+                                    AppLocalizations.of(context)!.yourAccount,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
                                   SizedBox(height: 8),
                                   TextField(
                                     controller: _usernameController,
                                     decoration: InputDecoration(
-                                      labelText: AppLocalizations.of(context)!.usernameLabel,
-                                      prefixIcon: Icon(Icons.person, color: Colors.teal),
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                      labelText: AppLocalizations.of(
+                                        context,
+                                      )!.usernameLabel,
+                                      prefixIcon: Icon(
+                                        Icons.person,
+                                        color: Colors.teal,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
                                       filled: true,
                                       fillColor: Colors.grey[50],
                                     ),
-                                    enabled: !_awaitingPassword, 
+                                    enabled: !_awaitingPassword,
                                   ),
-                                  
+
                                   // Chỉ hiện nút Tiếp tục nếu CHƯA chờ pass
                                   if (!_awaitingPassword) ...[
                                     SizedBox(height: 16),
                                     ElevatedButton(
-                                      onPressed: _isLoading ? null : _handleUsernameContinue,
+                                      onPressed: _isLoading
+                                          ? null
+                                          : _handleUsernameContinue,
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.teal.shade600,
-                                        padding: EdgeInsets.symmetric(vertical: 16),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 16,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
                                         elevation: 4,
                                       ),
                                       child: Text(
-                                        _isLoading ? AppLocalizations.of(context)!.processing : AppLocalizations.of(context)!.continueBtn,
-                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                        _isLoading
+                                            ? AppLocalizations.of(
+                                                context,
+                                              )!.processing
+                                            : AppLocalizations.of(
+                                                context,
+                                              )!.continueBtn,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -450,9 +585,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                       controller: _passwordController,
                                       obscureText: true,
                                       decoration: InputDecoration(
-                                        labelText: AppLocalizations.of(context)!.adminPassLabel,
-                                        prefixIcon: Icon(Icons.lock, color: Colors.orange),
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                        labelText: AppLocalizations.of(
+                                          context,
+                                        )!.adminPassLabel,
+                                        prefixIcon: Icon(
+                                          Icons.lock,
+                                          color: Colors.orange,
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
                                         filled: true,
                                         fillColor: Colors.grey[50],
                                       ),
@@ -462,16 +606,33 @@ class _LoginScreenState extends State<LoginScreen> {
                                       children: [
                                         Expanded(
                                           child: ElevatedButton(
-                                            onPressed: _isLoading ? null : _handleLogin,
+                                            onPressed: _isLoading
+                                                ? null
+                                                : _handleLogin,
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.orange.shade700,
-                                              padding: EdgeInsets.symmetric(vertical: 16),
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                              backgroundColor:
+                                                  Colors.orange.shade700,
+                                              padding: EdgeInsets.symmetric(
+                                                vertical: 16,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
                                               elevation: 4,
                                             ),
                                             child: Text(
-                                              _isLoading ? AppLocalizations.of(context)!.processing : AppLocalizations.of(context)!.enterHome,
-                                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                              _isLoading
+                                                  ? AppLocalizations.of(
+                                                      context,
+                                                    )!.processing
+                                                  : AppLocalizations.of(
+                                                      context,
+                                                    )!.enterHome,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -487,11 +648,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   });
                                                 },
                                           style: OutlinedButton.styleFrom(
-                                            side: BorderSide(color: Colors.grey),
-                                            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                            side: BorderSide(
+                                              color: Colors.grey,
+                                            ),
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: 16,
+                                              horizontal: 16,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
                                           ),
-                                          child: Icon(Icons.arrow_back, color: Colors.grey),
+                                          child: Icon(
+                                            Icons.arrow_back,
+                                            color: Colors.grey,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -501,8 +673,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                   if (!hasFamilyTyped)
                                     Center(
                                       child: TextButton(
-                                        onPressed: _isLoading ? null : _showRegisterDialog,
-                                        child: Text(AppLocalizations.of(context)!.registerOtherAccount, style: TextStyle(color: Colors.teal.shade600)),
+                                        onPressed: _isLoading
+                                            ? null
+                                            : _showRegisterDialog,
+                                        child: Text(
+                                          AppLocalizations.of(
+                                            context,
+                                          )!.registerOtherAccount,
+                                          style: TextStyle(
+                                            color: Colors.teal.shade600,
+                                          ),
+                                        ),
                                       ),
                                     ),
 
@@ -521,7 +702,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 _passwordController.clear();
                                               });
                                             },
-                                      child: Text(AppLocalizations.of(context)!.changeFamilyId, style: TextStyle(color: Colors.grey[600])),
+                                      child: Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.changeFamilyId,
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -536,7 +724,14 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-        ),
+            ),
+          ),
+          const Positioned(
+            top: 40,
+            right: 20,
+            child: LanguagePicker(isWhite: true),
+          ),
+        ],
       ),
     );
   }

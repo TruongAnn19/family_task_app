@@ -6,20 +6,23 @@ import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   static final FirebaseMessaging _fcm = FirebaseMessaging.instance;
-  static final FlutterLocalNotificationsPlugin _localParams = FlutterLocalNotificationsPlugin();
+  static final FlutterLocalNotificationsPlugin _localParams =
+      FlutterLocalNotificationsPlugin();
 
   // 1. Khởi tạo
   static Future<void> init() async {
     // --- QUAN TRỌNG: NẾU LÀ WEB THÌ DỪNG NGAY ---
     if (kIsWeb) {
       print("[WEB] Bỏ qua Notification Service.");
-      return; 
+      return;
     }
     // --------------------------------------------
 
     try {
       NotificationSettings settings = await _fcm.requestPermission(
-        alert: true, badge: true, sound: true,
+        alert: true,
+        badge: true,
+        sound: true,
       );
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         await _initLocalNotification();
@@ -51,11 +54,11 @@ class NotificationService {
 
   // 4. Cấu hình Local (Mobile Only)
   static Future<void> _initLocalNotification() async {
-    tz.initializeTimeZones(); 
-    const AndroidInitializationSettings androidSettings = 
+    tz.initializeTimeZones();
+    const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     final InitializationSettings settings = InitializationSettings(
-      android: androidSettings, 
+      android: androidSettings,
     );
     await _localParams.initialize(settings);
   }
@@ -71,13 +74,14 @@ class NotificationService {
       _nextSaturday9AM(),
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'reminder_channel', 
+          'reminder_channel',
           'Nhắc nhở việc nhà',
           importance: Importance.max,
           priority: Priority.high,
         ),
       ),
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
       androidAllowWhileIdle: true,
       matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
     );
@@ -85,7 +89,13 @@ class NotificationService {
 
   static tz.TZDateTime _nextSaturday9AM() {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, 9);
+    tz.TZDateTime scheduledDate = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      9,
+    );
     while (scheduledDate.weekday != DateTime.saturday) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }

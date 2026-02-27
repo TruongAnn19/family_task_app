@@ -38,12 +38,17 @@ class CalendarService {
         .collection('CalendarEvents')
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => CalendarEvent.fromFirestore(doc)).toList();
-    });
+          return snapshot.docs
+              .map((doc) => CalendarEvent.fromFirestore(doc))
+              .toList();
+        });
   }
-  
+
   // Get Events by specific month (more efficient)
-  Future<List<CalendarEvent>> getEventsByMonth(String familyId, DateTime month) async {
+  Future<List<CalendarEvent>> getEventsByMonth(
+    String familyId,
+    DateTime month,
+  ) async {
     // Start of month
     DateTime start = DateTime(month.year, month.month, 1);
     // End of month
@@ -57,6 +62,8 @@ class CalendarService {
         .where('date', isLessThanOrEqualTo: end)
         .get();
 
-    return snapshot.docs.map((doc) => CalendarEvent.fromFirestore(doc)).toList();
+    return snapshot.docs
+        .map((doc) => CalendarEvent.fromFirestore(doc))
+        .toList();
   }
 }

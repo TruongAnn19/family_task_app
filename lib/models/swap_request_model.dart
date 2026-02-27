@@ -22,16 +22,16 @@ class SwapRequest {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'familyId': familyId,
-        'weekId': weekId,
-        'taskId': taskId,
-        'taskName': taskName,
-        'fromUser': fromUser,
-        'toUser': toUser,
-        'status': status,
-        'createdAt': createdAt.toIso8601String(),
-      };
+    'id': id,
+    'familyId': familyId,
+    'weekId': weekId,
+    'taskId': taskId,
+    'taskName': taskName,
+    'fromUser': fromUser,
+    'toUser': toUser,
+    'status': status,
+    'createdAt': createdAt.toIso8601String(),
+  };
 
   factory SwapRequest.fromJson(Map<String, dynamic> json) {
     return SwapRequest(

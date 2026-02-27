@@ -7,10 +7,10 @@ class PenaltyNotice {
   final bool isRead;
 
   PenaltyNotice({
-    required this.id, 
-    required this.content, 
-    required this.createdAt, 
-    this.isRead = false
+    required this.id,
+    required this.content,
+    required this.createdAt,
+    this.isRead = false,
   });
 
   Map<String, dynamic> toJson() => {

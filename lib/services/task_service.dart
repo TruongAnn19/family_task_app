@@ -64,7 +64,10 @@ class TaskService {
     }
   }
 
-  Future<void> _checkAndPunishLastWeek(String familyId, String lastWeekId) async {
+  Future<void> _checkAndPunishLastWeek(
+    String familyId,
+    String lastWeekId,
+  ) async {
     // Lấy dữ liệu tuần trước
     var lastWeekDoc = await _db
         .collection('Households')
@@ -75,8 +78,11 @@ class TaskService {
 
     if (!lastWeekDoc.exists) return; // Tuần trước không có lịch thì thôi
 
-    WeeklySchedule lastSchedule = WeeklySchedule.fromFirestore(lastWeekDoc.data()!, lastWeekId);
-    
+    WeeklySchedule lastSchedule = WeeklySchedule.fromFirestore(
+      lastWeekDoc.data()!,
+      lastWeekId,
+    );
+
     // Tìm những kẻ lười biếng (chưa Done)
     List<String> lazyPeople = [];
     for (var task in lastSchedule.assignments) {
@@ -87,18 +93,21 @@ class TaskService {
 
     // Nếu có người lười -> Ghi vào bảng Notifications
     if (lazyPeople.isNotEmpty) {
-      String punishmentContent = "⚠️ BIÊN BẢN TUẦN $lastWeekId:\n" + lazyPeople.join("\n");
-      
+      String punishmentContent =
+          "⚠️ BIÊN BẢN TUẦN $lastWeekId:\n" + lazyPeople.join("\n");
+
       await _db
           .collection('Households')
           .doc(familyId)
           .collection('Notifications') // Collection mới
-          .add(PenaltyNotice(
-            id: '', 
-            content: punishmentContent, 
-            createdAt: DateTime.now()
-          ).toJson());
-          
+          .add(
+            PenaltyNotice(
+              id: '',
+              content: punishmentContent,
+              createdAt: DateTime.now(),
+            ).toJson(),
+          );
+
       print("Đã ghi nhận phạt cho tuần cũ!");
     }
   }
@@ -131,7 +140,10 @@ class TaskService {
 
     // --- FAIRNESS LOGIC ADDITION ---
     // Trước khi lưu xuống DB, kiểm tra nợ nần và gán lại việc
-    newAssignments = await _applyFairnessLogic(household.familyId, newAssignments);
+    newAssignments = await _applyFairnessLogic(
+      household.familyId,
+      newAssignments,
+    );
     // -------------------------------
 
     await ref.set({
@@ -238,7 +250,10 @@ class TaskService {
   }
 
   // 2. Lấy stream các yêu cầu đang chờ xử lý của user
-  Stream<List<SwapRequest>> getSwapRequestsStream(String familyId, String username) {
+  Stream<List<SwapRequest>> getSwapRequestsStream(
+    String familyId,
+    String username,
+  ) {
     return _db
         .collection('Households')
         .doc(familyId)
@@ -248,10 +263,12 @@ class TaskService {
         // .orderBy('createdAt', descending: true) // REMOVED to avoid Index Requirement
         .snapshots()
         .map((snapshot) {
-            var list = snapshot.docs.map((doc) => SwapRequest.fromJson(doc.data())).toList();
-            // Client-side Sort
-            list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-            return list;
+          var list = snapshot.docs
+              .map((doc) => SwapRequest.fromJson(doc.data()))
+              .toList();
+          // Client-side Sort
+          list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return list;
         });
   }
 
@@ -276,12 +293,19 @@ class TaskService {
   }
 
   // 6. Ghi nợ Swap (Fairness Logic)
-  Future<void> _recordSwapDebt(String familyId, String debtor, String creditor) async {
+  Future<void> _recordSwapDebt(
+    String familyId,
+    String debtor,
+    String creditor,
+  ) async {
     // debtor: Người nhờ (A) - Nợ 1 việc
     // creditor: Người làm hộ (B)
-    
-    CollectionReference debtRef = _db.collection('Households').doc(familyId).collection('SwapDebts');
-    
+
+    CollectionReference debtRef = _db
+        .collection('Households')
+        .doc(familyId)
+        .collection('SwapDebts');
+
     // Tìm xem đã có nợ chưa
     QuerySnapshot existing = await debtRef
         .where('debtor', isEqualTo: debtor)
@@ -290,67 +314,67 @@ class TaskService {
         .get();
 
     if (existing.docs.isNotEmpty) {
-        // Update count
-        await debtRef.doc(existing.docs.first.id).update({
-            'count': FieldValue.increment(1)
-        });
+      // Update count
+      await debtRef.doc(existing.docs.first.id).update({
+        'count': FieldValue.increment(1),
+      });
     } else {
-        // Create new debt
-        await debtRef.add({
-            'debtor': debtor,
-            'creditor': creditor,
-            'count': 1
-        });
+      // Create new debt
+      await debtRef.add({'debtor': debtor, 'creditor': creditor, 'count': 1});
     }
   }
 
   // 7. Xử lý trả nợ khi tạo lịch mới
-  Future<List<TaskAssignment>> _applyFairnessLogic(String familyId, List<TaskAssignment> assignments) async {
-      CollectionReference debtRef = _db.collection('Households').doc(familyId).collection('SwapDebts');
-      QuerySnapshot debts = await debtRef.where('count', isGreaterThan: 0).get();
+  Future<List<TaskAssignment>> _applyFairnessLogic(
+    String familyId,
+    List<TaskAssignment> assignments,
+  ) async {
+    CollectionReference debtRef = _db
+        .collection('Households')
+        .doc(familyId)
+        .collection('SwapDebts');
+    QuerySnapshot debts = await debtRef.where('count', isGreaterThan: 0).get();
 
-      if (debts.docs.isEmpty) return assignments;
+    if (debts.docs.isEmpty) return assignments;
 
-      List<TaskAssignment> updatedAssignments = List.from(assignments);
+    List<TaskAssignment> updatedAssignments = List.from(assignments);
 
-      for (var doc in debts.docs) {
-          Map<String, dynamic> debt = doc.data() as Map<String, dynamic>;
-          String debtor = debt['debtor']; // A (người nợ)
-          String creditor = debt['creditor']; // B (người chủ nợ)
-          int count = debt['count'];
+    for (var doc in debts.docs) {
+      Map<String, dynamic> debt = doc.data() as Map<String, dynamic>;
+      String debtor = debt['debtor']; // A (người nợ)
+      String creditor = debt['creditor']; // B (người chủ nợ)
+      int count = debt['count'];
 
-          // Tìm việc của B (creditor) để gán cho A (debtor)
-          // Ưu tiên việc chưa Done (logic tạo mới thì tất cả chưa Done)
-          List<int> creditorTaskIndices = [];
-          for (int i = 0; i < updatedAssignments.length; i++) {
-              if (updatedAssignments[i].assignedTo == creditor) {
-                  creditorTaskIndices.add(i);
-              }
-          }
-
-          // Trả nợ tối đa số lượng tasks B có hoặc số lượng nợ
-          for (int i = 0; i < count && creditorTaskIndices.isNotEmpty; i++) {
-              int taskIndex = creditorTaskIndices.removeLast(); // Lấy việc cuối cùng của B
-              
-              // Gán lại cho A
-              var originalTask = updatedAssignments[taskIndex];
-              updatedAssignments[taskIndex] = TaskAssignment(
-                  taskId: originalTask.taskId,
-                  taskName: originalTask.taskName,
-                  assignedTo: debtor, // A PHẢI LÀM
-                  isDone: false,
-                  proofImage: originalTask.proofImage
-              );
-
-              // Giảm nợ
-              await debtRef.doc(doc.id).update({
-                  'count': FieldValue.increment(-1)
-              });
-          }
+      // Tìm việc của B (creditor) để gán cho A (debtor)
+      // Ưu tiên việc chưa Done (logic tạo mới thì tất cả chưa Done)
+      List<int> creditorTaskIndices = [];
+      for (int i = 0; i < updatedAssignments.length; i++) {
+        if (updatedAssignments[i].assignedTo == creditor) {
+          creditorTaskIndices.add(i);
+        }
       }
-      return updatedAssignments;
-  }
 
+      // Trả nợ tối đa số lượng tasks B có hoặc số lượng nợ
+      for (int i = 0; i < count && creditorTaskIndices.isNotEmpty; i++) {
+        int taskIndex = creditorTaskIndices
+            .removeLast(); // Lấy việc cuối cùng của B
+
+        // Gán lại cho A
+        var originalTask = updatedAssignments[taskIndex];
+        updatedAssignments[taskIndex] = TaskAssignment(
+          taskId: originalTask.taskId,
+          taskName: originalTask.taskName,
+          assignedTo: debtor, // A PHẢI LÀM
+          isDone: false,
+          proofImage: originalTask.proofImage,
+        );
+
+        // Giảm nợ
+        await debtRef.doc(doc.id).update({'count': FieldValue.increment(-1)});
+      }
+    }
+    return updatedAssignments;
+  }
 
   // Internal: Thực hiện đổi người trong Schedule
   Future<void> _processSwap(SwapRequest req) async {
@@ -368,36 +392,44 @@ class TaskService {
       WeeklySchedule schedule = WeeklySchedule.fromFirestore(data, req.weekId);
 
       // Tìm công việc cần đổi
-      List<TaskAssignment> updatedAssignments = schedule.assignments.map((task) {
+      List<TaskAssignment> updatedAssignments = schedule.assignments.map((
+        task,
+      ) {
         if (task.taskId == req.taskId && task.assignedTo == req.fromUser) {
-           // Swap: fromUser -> toUser
-           return TaskAssignment(
-               taskId: task.taskId,
-               taskName: task.taskName,
-               assignedTo: req.toUser, // Change to new user
-               isDone: task.isDone,
-               proofImage: task.proofImage
-           );
+          // Swap: fromUser -> toUser
+          return TaskAssignment(
+            taskId: task.taskId,
+            taskName: task.taskName,
+            assignedTo: req.toUser, // Change to new user
+            isDone: task.isDone,
+            proofImage: task.proofImage,
+          );
         }
         return task;
       }).toList();
 
       transaction.update(scheduleRef, {
-        'assignments': updatedAssignments.map((e) => e.toJson()).toList()
+        'assignments': updatedAssignments.map((e) => e.toJson()).toList(),
       });
     });
   }
 
   // 4. Lấy stream các yêu cầu mà user đã GỬI đi (để update UI bên gửi)
-  Stream<List<SwapRequest>> getSentSwapRequestsStream(String familyId, String username) {
+  Stream<List<SwapRequest>> getSentSwapRequestsStream(
+    String familyId,
+    String username,
+  ) {
     return _db
         .collection('Households')
         .doc(familyId)
         .collection('SwapRequests')
         .where('fromUser', isEqualTo: username)
         .snapshots() // Lấy hết để check status
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => SwapRequest.fromJson(doc.data())).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => SwapRequest.fromJson(doc.data()))
+              .toList(),
+        );
   }
 
   // 5. Hủy yêu cầu (Bên gửi)

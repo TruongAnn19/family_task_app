@@ -14,12 +14,12 @@ class TaskAssignment {
   });
 
   Map<String, dynamic> toJson() => {
-        'taskId': taskId,
-        'taskName': taskName,
-        'assignedTo': assignedTo,
-        'isDone': isDone,
-        'proofImage': proofImage,
-      };
+    'taskId': taskId,
+    'taskName': taskName,
+    'assignedTo': assignedTo,
+    'isDone': isDone,
+    'proofImage': proofImage,
+  };
 
   factory TaskAssignment.fromJson(Map<String, dynamic> json) {
     return TaskAssignment(
@@ -41,9 +41,11 @@ class WeeklySchedule {
   factory WeeklySchedule.fromFirestore(Map<String, dynamic> data, String id) {
     return WeeklySchedule(
       weekId: id,
-      assignments: (data['assignments'] as List<dynamic>?)
+      assignments:
+          (data['assignments'] as List<dynamic>?)
               ?.map((e) => TaskAssignment.fromJson(e))
-              .toList() ?? [],
+              .toList() ??
+          [],
     );
   }
 }

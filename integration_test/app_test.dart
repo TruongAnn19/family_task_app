@@ -7,14 +7,14 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('App Integration Tests', () {
-
-    testWidgets('TC1: Admin Login -> Dashboard -> Logout -> Member Login',
-        (WidgetTester tester) async {
+    testWidgets('TC1: Admin Login -> Dashboard -> Logout -> Member Login', (
+      WidgetTester tester,
+    ) async {
       // ========================================
       // KHỞI ĐỘNG APP
       // ========================================
       app.main();
-      
+
       // Chờ SplashScreen load xong (có CircularProgressIndicator nên
       // KHÔNG dùng pumpAndSettle - nó sẽ chờ mãi)
       // Pump nhiều frame nhỏ để chờ navigation
@@ -26,7 +26,7 @@ void main() {
       // LUỒNG 1: ĐĂNG NHẬP ADMIN
       // ========================================
       debugPrint('=== TC1: Admin Login Flow ===');
-      
+
       // Bước 1: Nhập Family ID
       debugPrint('Step 1: Nhập Family ID "test1"');
       final allFields = find.byType(TextField);
@@ -37,9 +37,13 @@ void main() {
       // Bước 2: Nhấn tìm kiếm
       debugPrint('Step 2: Nhấn icon tìm kiếm');
       final searchIcon = find.byIcon(Icons.search);
-      expect(searchIcon, findsOneWidget, reason: 'Không tìm thấy icon tìm kiếm');
+      expect(
+        searchIcon,
+        findsOneWidget,
+        reason: 'Không tìm thấy icon tìm kiếm',
+      );
       await tester.tap(searchIcon);
-      
+
       // Chờ Firebase trả kết quả
       for (int i = 0; i < 20; i++) {
         await tester.pump(Duration(milliseconds: 500));
@@ -47,8 +51,11 @@ void main() {
 
       // Bước 3: Kiểm tra "Xin chào!" hiển thị (family found)
       debugPrint('Step 3: Kiểm tra family found');
-      expect(find.text('Xin chào!'), findsOneWidget,
-          reason: 'Family "test1" không tìm thấy trên Firebase');
+      expect(
+        find.text('Xin chào!'),
+        findsOneWidget,
+        reason: 'Family "test1" không tìm thấy trên Firebase',
+      );
       debugPrint('✅ Family "test1" tìm thấy');
 
       // Bước 4: Nhập Username admin = "test"
@@ -60,7 +67,11 @@ void main() {
       // Bước 5: Nhấn "Tiếp tục"
       debugPrint('Step 5: Nhấn "Tiếp tục"');
       final continueBtn = find.text('Tiếp tục');
-      expect(continueBtn, findsOneWidget, reason: 'Không tìm thấy nút Tiếp tục');
+      expect(
+        continueBtn,
+        findsOneWidget,
+        reason: 'Không tìm thấy nút Tiếp tục',
+      );
       await tester.tap(continueBtn);
       for (int i = 0; i < 10; i++) {
         await tester.pump(Duration(milliseconds: 500));
@@ -68,8 +79,11 @@ void main() {
 
       // Bước 6: Kiểm tra ô mật khẩu hiển thị (vì test là admin)
       debugPrint('Step 6: Kiểm tra ô mật khẩu Admin hiện ra');
-      expect(find.text('Mật khẩu Admin'), findsOneWidget,
-          reason: 'Ô mật khẩu Admin KHÔNG hiện ra -> LỖI');
+      expect(
+        find.text('Mật khẩu Admin'),
+        findsOneWidget,
+        reason: 'Ô mật khẩu Admin KHÔNG hiện ra -> LỖI',
+      );
       debugPrint('✅ Ô mật khẩu Admin hiện ra đúng');
 
       // Bước 7: Nhập mật khẩu
@@ -89,15 +103,18 @@ void main() {
 
       // Bước 9: Kiểm tra Dashboard hiển thị
       debugPrint('Step 9: Kiểm tra Dashboard');
-      expect(find.text('Xin chào,'), findsOneWidget,
-          reason: 'Dashboard không hiển thị "Xin chào,"');
+      expect(
+        find.text('Xin chào,'),
+        findsOneWidget,
+        reason: 'Dashboard không hiển thị "Xin chào,"',
+      );
       debugPrint('✅ LUỒNG 1 THÀNH CÔNG: Admin đăng nhập thành công!');
 
       // ========================================
       // LUỒNG 2: ĐĂNG XUẤT
       // ========================================
       debugPrint('=== TC2: Logout Flow ===');
-      
+
       debugPrint('Step 10: Nhấn nút Đăng xuất');
       final logoutBtn = find.byIcon(Icons.logout);
       expect(logoutBtn, findsOneWidget, reason: 'Không tìm thấy nút Đăng xuất');
@@ -111,8 +128,11 @@ void main() {
       for (int i = 0; i < 10; i++) {
         await tester.pump(Duration(milliseconds: 500));
       }
-      expect(find.text('Chào mừng trở lại'), findsOneWidget,
-          reason: 'Không quay về màn hình Login');
+      expect(
+        find.text('Chào mừng trở lại'),
+        findsOneWidget,
+        reason: 'Không quay về màn hình Login',
+      );
       debugPrint('✅ LUỒNG 2 THÀNH CÔNG: Đăng xuất thành công!');
 
       // ========================================
@@ -144,11 +164,19 @@ void main() {
 
       // Bước 16: Kiểm tra KHÔNG có ô mật khẩu và vào thẳng Dashboard
       debugPrint('Step 16: Kiểm tra vào Dashboard không cần mật khẩu');
-      expect(find.text('Mật khẩu Admin'), findsNothing,
-          reason: 'Ô mật khẩu Admin HIỆN RA cho member -> LỖI');
-      expect(find.text('Xin chào,'), findsOneWidget,
-          reason: 'Dashboard không hiển thị cho member');
-      debugPrint('✅ LUỒNG 3 THÀNH CÔNG: Member vào Dashboard không cần password!');
+      expect(
+        find.text('Mật khẩu Admin'),
+        findsNothing,
+        reason: 'Ô mật khẩu Admin HIỆN RA cho member -> LỖI',
+      );
+      expect(
+        find.text('Xin chào,'),
+        findsOneWidget,
+        reason: 'Dashboard không hiển thị cho member',
+      );
+      debugPrint(
+        '✅ LUỒNG 3 THÀNH CÔNG: Member vào Dashboard không cần password!',
+      );
 
       debugPrint('');
       debugPrint('==============================');

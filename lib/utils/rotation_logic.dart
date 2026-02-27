@@ -1,13 +1,12 @@
 import '../models/household_model.dart'; // Import file model ở trên
 
 class RotationLogic {
-  
   // 1. Hàm lấy số tuần hiện tại của năm
   static int getCurrentWeekNumber() {
     final now = DateTime.now();
     final firstDay = DateTime(now.year, 1, 1);
     final dayOfYear = now.difference(firstDay).inDays;
-    return (dayOfYear / 7).ceil(); 
+    return (dayOfYear / 7).ceil();
   }
 
   // 2. Hàm tính toán người phụ trách (Core Algo)
@@ -29,7 +28,7 @@ class RotationLogic {
         index = weekNumber % n;
         break;
       case 5: // Kịch bản 5: Theo lượt (Counter)
-        index = task.counter % n; 
+        index = task.counter % n;
         break;
       case 1:
       case 4: // Kịch bản 1, 4: Xoay vòng chia đều

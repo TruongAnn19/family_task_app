@@ -18,17 +18,21 @@ class MockAuthService implements AuthService {
       Member(name: 'RegularUser', isAdmin: false),
     ];
   }
-  
+
   @override
   Future<void> addMember(String familyId, String name) async {}
-  
+
   @override
   Future<bool> verifyAdmin(String familyId, String password) async {
     return password == '1234';
   }
 
   @override
-  Future<void> registerHousehold({required String familyId, required String adminUser, required String password}) async {}
+  Future<void> registerHousehold({
+    required String familyId,
+    required String adminUser,
+    required String password,
+  }) async {}
 
   @override
   Future<List<TaskConfig>> getTaskConfigs(String familyId) async {
@@ -36,13 +40,22 @@ class MockAuthService implements AuthService {
   }
 
   @override
-  Future<void> updateMemberToken(String familyId, String memberName, String token) async {}
+  Future<void> updateMemberToken(
+    String familyId,
+    String memberName,
+    String token,
+  ) async {}
 
   @override
   Future<void> removeMember(String familyId, Member member) async {}
-  
+
   @override
-  Future<void> addTaskConfig(String familyId, String title, int scenario, int offset) async {}
+  Future<void> addTaskConfig(
+    String familyId,
+    String title,
+    int scenario,
+    int offset,
+  ) async {}
 
   @override
   Future<void> removeTaskConfig(String familyId, TaskConfig task) async {}
@@ -56,18 +69,22 @@ void main() {
       mockAuthService = MockAuthService();
     });
 
-    testWidgets('1. Admin Login Flow (Password Required)', (WidgetTester tester) async {
+    testWidgets('1. Admin Login Flow (Password Required)', (
+      WidgetTester tester,
+    ) async {
       print('--- TEST 1: Admin Login ---');
       bool loginSuccess = false;
-      
-      await tester.pumpWidget(MaterialApp(
-        home: LoginScreen(
-          authService: mockAuthService,
-          onLoginSuccess: (fid, member) {
-            loginSuccess = true;
-          },
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LoginScreen(
+            authService: mockAuthService,
+            onLoginSuccess: (fid, member) {
+              loginSuccess = true;
+            },
+          ),
         ),
-      ));
+      );
 
       // 1. Enter Family ID
       print('Step 1: Entering Family ID');
@@ -77,9 +94,12 @@ void main() {
       await tester.pumpAndSettle(); // Wait for async checkFamilyExists
 
       // Verify "Xin chào" or "Chào mừng trở lại" indicates family found
-      expect(find.textContaining('Xin chào!'), findsOneWidget); // Adjusted based on code
+      expect(
+        find.textContaining('Xin chào!'),
+        findsOneWidget,
+      ); // Adjusted based on code
       print('Step 2: Family Found');
-      
+
       // 2. Enter Username "AdminUser"
       print('Step 3: Entering Admin Username');
       final userField = find.byType(TextField).at(1); // Username field appears
@@ -93,31 +113,35 @@ void main() {
       // 4. Verify Password Field appears (because AdminUser is admin)
       expect(find.text('Mật khẩu Admin'), findsOneWidget);
       print('Step 4: Password Field Appeared (Correct)');
-      
+
       // 5. Enter Correct Password
       print('Step 5: Entering Password');
       final passField = find.byType(TextField).last;
       await tester.enterText(passField, '1234');
       await tester.tap(find.text('Vào Nhà'));
-      await tester.pumpAndSettle(); 
-      
+      await tester.pumpAndSettle();
+
       // Verify login success callback triggered
       expect(loginSuccess, isTrue);
       print('Step 6: Login Success (Admin)');
     });
 
-    testWidgets('2. Member Login Flow (No Password)', (WidgetTester tester) async {
+    testWidgets('2. Member Login Flow (No Password)', (
+      WidgetTester tester,
+    ) async {
       print('--- TEST 2: Member Login ---');
       bool loginSuccess = false;
 
-      await tester.pumpWidget(MaterialApp(
-        home: LoginScreen(
-          authService: mockAuthService,
-          onLoginSuccess: (fid, member) {
-            loginSuccess = true;
-          },
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LoginScreen(
+            authService: mockAuthService,
+            onLoginSuccess: (fid, member) {
+              loginSuccess = true;
+            },
+          ),
         ),
-      ));
+      );
 
       // 1. Enter Family ID
       print('Step 1: Entering Family ID');
@@ -129,16 +153,16 @@ void main() {
       print('Step 2: Entering Member Username');
       await tester.enterText(find.byType(TextField).at(1), 'RegularUser');
       await tester.pumpAndSettle();
-      
+
       // 3. Click "Tiếp tục"
       print('Step 3: Clicking Continue');
       await tester.tap(find.text('Tiếp tục'));
-      await tester.pumpAndSettle(); 
+      await tester.pumpAndSettle();
 
       // 4. Verify NO Password Field (Login success immediate)
       expect(find.text('Mật khẩu Admin'), findsNothing);
       print('Step 4: No Password Field (Correct)');
-      
+
       // Verify Success
       expect(loginSuccess, isTrue);
       print('Step 5: Login Success (Member)');

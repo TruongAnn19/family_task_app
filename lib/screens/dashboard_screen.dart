@@ -19,6 +19,8 @@ import '../services/calendar_service.dart';
 import '../services/notification_service.dart';
 import '../models/swap_request_model.dart';
 import 'package:family_task_app/l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import '../providers/locale_provider.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String familyId;
@@ -249,7 +251,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       SizedBox(width: 4),
                       Flexible(
                         child: Text(
-                          AppLocalizations.of(context)!.familyId(widget.familyId),
+                          AppLocalizations.of(
+                            context,
+                          )!.familyId(widget.familyId),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -297,6 +301,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 TaskManagementScreen(familyId: widget.familyId),
                           ),
                         );
+                      } else if (choice == 'language') {
+                        final localeProvider = Provider.of<LocaleProvider>(
+                          context,
+                          listen: false,
+                        );
+                        if (localeProvider.locale.languageCode == 'vi') {
+                          localeProvider.setLocale(const Locale('en'));
+                        } else {
+                          localeProvider.setLocale(const Locale('vi'));
+                        }
                       }
                     },
                     itemBuilder: (context) => [
@@ -317,6 +331,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             Icon(Icons.list_alt, color: Colors.green),
                             SizedBox(width: 8),
                             Text(AppLocalizations.of(context)!.tasks),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem(
+                        value: 'language',
+                        child: Row(
+                          children: [
+                            Icon(Icons.language, color: Colors.orange),
+                            SizedBox(width: 8),
+                            Text(AppLocalizations.of(context)!.switchLanguage),
                           ],
                         ),
                       ),
@@ -381,7 +406,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    AppLocalizations.of(context)!.weekNum(_schedule?.weekId.split('_W')[1] ?? '...'),
+                    AppLocalizations.of(
+                      context,
+                    )!.weekNum(_schedule?.weekId.split('_W')[1] ?? '...'),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -451,10 +478,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
               SizedBox(height: 8),
-              Text(
-                notice.content,
-                style: TextStyle(fontSize: 14),
-              ),
+              Text(notice.content, style: TextStyle(fontSize: 14)),
             ],
           ),
         );
@@ -587,7 +611,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        task.isDone ? AppLocalizations.of(context)!.taskCompleted : AppLocalizations.of(context)!.taskIncomplete,
+                        task.isDone
+                            ? AppLocalizations.of(context)!.taskCompleted
+                            : AppLocalizations.of(context)!.taskIncomplete,
                         style: TextStyle(
                           color: task.isDone ? Colors.green : Colors.orange,
                           fontSize: 12,
@@ -648,7 +674,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             subtitle: Text(
-              AppLocalizations.of(context)!.assignedToOther(isMe ? AppLocalizations.of(context)!.assignedToYou : task.assignedTo),
+              AppLocalizations.of(context)!.assignedToOther(
+                isMe
+                    ? AppLocalizations.of(context)!.assignedToYou
+                    : task.assignedTo,
+              ),
               style: TextStyle(
                 fontSize: 13,
                 color: isMe ? Colors.teal : Colors.grey[600],
@@ -688,15 +718,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             // 1. Check Tet Holiday (Lunar Logic)
             final lunarDate = Lunar(date: _focusedDay, createdFromSolar: true);
-            final bool isTetHoliday = (lunarDate.month == 12 && lunarDate.day >= 29) || 
-                                      (lunarDate.month == 1 && lunarDate.day <= 6);
+            final bool isTetHoliday =
+                (lunarDate.month == 12 && lunarDate.day >= 29) ||
+                (lunarDate.month == 1 && lunarDate.day <= 6);
 
             // 2. Check Special Holiday (Solar/Lunar Logic)
-            final HolidayTheme? holidayTheme = ZodiacHelper.getSpecialHolidayTheme(
-              _focusedDay, 
-              lunarDay: lunarDate.day,
-              lunarMonth: lunarDate.month,
-            );
+            final HolidayTheme? holidayTheme =
+                ZodiacHelper.getSpecialHolidayTheme(
+                  _focusedDay,
+                  lunarDay: lunarDate.day,
+                  lunarMonth: lunarDate.month,
+                );
 
             // 3. Determine Active Theme Colors
             List<Color> activeGradient;
@@ -721,9 +753,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
-              clipBehavior: Clip.hardEdge, 
-              backgroundColor: Colors.transparent, 
-              elevation: 0, 
+              clipBehavior: Clip.hardEdge,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
               insetPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: Container(
                 height: MediaQuery.of(context).size.height * 0.9,
@@ -744,8 +776,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         holidayTheme: holidayTheme, // Special holiday override
                       ),
                     ),
-                    CalendarStyleHelper.buildCornerOrnament(true, zodiacGradient: (isTetHoliday || holidayTheme != null) ? activeGradient : null), 
-                    CalendarStyleHelper.buildCornerOrnament(false, zodiacGradient: (isTetHoliday || holidayTheme != null) ? activeGradient : null),
+                    CalendarStyleHelper.buildCornerOrnament(
+                      true,
+                      zodiacGradient: (isTetHoliday || holidayTheme != null)
+                          ? activeGradient
+                          : null,
+                    ),
+                    CalendarStyleHelper.buildCornerOrnament(
+                      false,
+                      zodiacGradient: (isTetHoliday || holidayTheme != null)
+                          ? activeGradient
+                          : null,
+                    ),
 
                     // === 2. MAIN CONTENT ===
                     Column(
@@ -754,9 +796,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Container(
                           padding: EdgeInsets.fromLTRB(24, 20, 16, 12),
                           decoration: BoxDecoration(
-                            border: Border(bottom: BorderSide(color: Colors.black12)),
-                            color: useRedTheme 
-                                ? activeColor.withOpacity(0.05) 
+                            border: Border(
+                              bottom: BorderSide(color: Colors.black12),
+                            ),
+                            color: useRedTheme
+                                ? activeColor.withOpacity(0.05)
                                 : Colors.white.withOpacity(0.85),
                           ),
                           child: Row(
@@ -768,38 +812,63 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     ShaderMask(
-                                      shaderCallback: (bounds) => LinearGradient(
-                                        colors: useRedTheme 
-                                            ? activeGradient 
-                                            : [zodiacGradient[0], zodiacGradient[1], zodiacGradient[0]],
-                                        stops: useRedTheme ? [0.0, 1.0] : [0.0, 0.5, 1.0],
-                                      ).createShader(bounds),
+                                      shaderCallback: (bounds) =>
+                                          LinearGradient(
+                                            colors: useRedTheme
+                                                ? activeGradient
+                                                : [
+                                                    zodiacGradient[0],
+                                                    zodiacGradient[1],
+                                                    zodiacGradient[0],
+                                                  ],
+                                            stops: useRedTheme
+                                                ? [0.0, 1.0]
+                                                : [0.0, 0.5, 1.0],
+                                          ).createShader(bounds),
                                       child: Text(
-                                        AppLocalizations.of(context)!.perpetualCalendar,
-                                        style: CalendarStyleHelper.calendarTitleStyle(activeColor),
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.perpetualCalendar,
+                                        style:
+                                            CalendarStyleHelper.calendarTitleStyle(
+                                              activeColor,
+                                            ),
                                       ),
                                     ),
                                     SizedBox(height: 6),
                                     Row(
                                       children: [
                                         // Badge con giáp
-                                        ZodiacHelper.buildZodiacBadge(_focusedDay.year),
+                                        ZodiacHelper.buildZodiacBadge(
+                                          _focusedDay.year,
+                                        ),
                                         SizedBox(width: 8),
                                         // Badge tháng
                                         Container(
-                                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 3,
+                                          ),
                                           decoration: BoxDecoration(
                                             border: Border.all(
-                                              color: useRedTheme ? activeColor.withOpacity(0.3) : Colors.grey.shade400
+                                              color: useRedTheme
+                                                  ? activeColor.withOpacity(0.3)
+                                                  : Colors.grey.shade400,
                                             ),
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                             color: Colors.white,
                                           ),
                                           child: Text(
-                                            AppLocalizations.of(context)!.month(_focusedDay.month),
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.month(_focusedDay.month),
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              color: useRedTheme ? activeColor : Colors.grey.shade700,
+                                              color: useRedTheme
+                                                  ? activeColor
+                                                  : Colors.grey.shade700,
                                               fontSize: 12,
                                             ),
                                           ),
@@ -818,15 +887,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   child: Container(
                                     padding: EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: useRedTheme ? Colors.white : Colors.grey.shade100, 
+                                      color: useRedTheme
+                                          ? Colors.white
+                                          : Colors.grey.shade100,
                                       shape: BoxShape.circle,
-                                      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
-                                      border: useRedTheme ? Border.all(color: activeColor.withOpacity(0.2)) : null,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 4,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                      border: useRedTheme
+                                          ? Border.all(
+                                              color: activeColor.withOpacity(
+                                                0.2,
+                                              ),
+                                            )
+                                          : null,
                                     ),
                                     child: Icon(
-                                      Icons.close, 
-                                      color: useRedTheme ? activeColor : Colors.grey[800], 
-                                      size: 22
+                                      Icons.close,
+                                      color: useRedTheme
+                                          ? activeColor
+                                          : Colors.grey[800],
+                                      size: 22,
                                     ),
                                   ),
                                 ),
@@ -839,7 +924,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Expanded(
                           child: SingleChildScrollView(
                             physics: BouncingScrollPhysics(),
-                            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 8,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
@@ -848,12 +936,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   firstDay: DateTime.utc(2020, 10, 16),
                                   lastDay: DateTime.utc(2030, 3, 14),
                                   focusedDay: _focusedDay,
-                                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                                  selectedDayPredicate: (day) =>
+                                      isSameDay(_selectedDay, day),
                                   eventLoader: _getEventsForDay,
                                   calendarFormat: CalendarFormat.month,
-                                  availableGestures: AvailableGestures.horizontalSwipe,
+                                  availableGestures:
+                                      AvailableGestures.horizontalSwipe,
                                   rowHeight: 64, // Tăng chiều cao ô ngày
-
                                   // Navigation Header
                                   headerStyle: HeaderStyle(
                                     formatButtonVisible: false,
@@ -868,18 +957,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     leftChevronIcon: Container(
                                       padding: EdgeInsets.all(6),
                                       decoration: BoxDecoration(
-                                        color: zodiacGradient[0].withOpacity(0.08),
+                                        color: zodiacGradient[0].withOpacity(
+                                          0.08,
+                                        ),
                                         shape: BoxShape.circle,
                                       ),
-                                      child: Icon(Icons.chevron_left, color: zodiacGradient[0], size: 22),
+                                      child: Icon(
+                                        Icons.chevron_left,
+                                        color: zodiacGradient[0],
+                                        size: 22,
+                                      ),
                                     ),
                                     rightChevronIcon: Container(
                                       padding: EdgeInsets.all(6),
                                       decoration: BoxDecoration(
-                                        color: zodiacGradient[0].withOpacity(0.08),
+                                        color: zodiacGradient[0].withOpacity(
+                                          0.08,
+                                        ),
                                         shape: BoxShape.circle,
                                       ),
-                                      child: Icon(Icons.chevron_right, color: zodiacGradient[0], size: 22),
+                                      child: Icon(
+                                        Icons.chevron_right,
+                                        color: zodiacGradient[0],
+                                        size: 22,
+                                      ),
                                     ),
                                     headerMargin: EdgeInsets.only(bottom: 8),
                                   ),
@@ -902,8 +1003,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   calendarStyle: CalendarStyle(
                                     outsideDaysVisible: false,
                                     cellMargin: EdgeInsets.all(3),
-                                    defaultTextStyle: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF263238)),
-                                    weekendTextStyle: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFD32F2F)),
+                                    defaultTextStyle: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF263238),
+                                    ),
+                                    weekendTextStyle: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFFD32F2F),
+                                    ),
                                     todayDecoration: BoxDecoration(),
                                     selectedDecoration: BoxDecoration(),
                                     markerDecoration: BoxDecoration(),
@@ -914,7 +1021,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     setStateDialog(() {
                                       _selectedDay = selectedDay;
                                       _focusedDay = focusedDay;
-                                      _selectedEvents = _getEventsForDay(selectedDay);
+                                      _selectedEvents = _getEventsForDay(
+                                        selectedDay,
+                                      );
                                     });
                                   },
                                   onPageChanged: (focusedDay) {
@@ -929,40 +1038,69 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       // Markers handled inside cell builders
                                       return SizedBox();
                                     },
-                                    defaultBuilder: (context, day, focusedDay) =>
-                                        _buildCalendarCell(day, zodiacGradient: zodiacGradient),
-                                    selectedBuilder: (context, day, focusedDay) =>
-                                        _buildCalendarCell(day, isSelected: true, zodiacGradient: zodiacGradient),
+                                    defaultBuilder:
+                                        (context, day, focusedDay) =>
+                                            _buildCalendarCell(
+                                              day,
+                                              zodiacGradient: zodiacGradient,
+                                            ),
+                                    selectedBuilder:
+                                        (context, day, focusedDay) =>
+                                            _buildCalendarCell(
+                                              day,
+                                              isSelected: true,
+                                              zodiacGradient: zodiacGradient,
+                                            ),
                                     todayBuilder: (context, day, focusedDay) =>
-                                        _buildCalendarCell(day, isToday: true, zodiacGradient: zodiacGradient),
-                                    outsideBuilder: (context, day, focusedDay) => SizedBox(),
+                                        _buildCalendarCell(
+                                          day,
+                                          isToday: true,
+                                          zodiacGradient: zodiacGradient,
+                                        ),
+                                    outsideBuilder:
+                                        (context, day, focusedDay) =>
+                                            SizedBox(),
                                   ),
                                 ),
 
                                 // ── DECORATIVE DIVIDER ──
-                                CalendarStyleHelper.buildDecorativeDivider(zodiacGradient),
+                                CalendarStyleHelper.buildDecorativeDivider(
+                                  zodiacGradient,
+                                ),
 
                                 // ── EVENT SECTION ──
                                 Builder(
                                   builder: (context) {
-                                    final lunarSelected = Lunar(date: _selectedDay!, createdFromSolar: true);
-                                    String? solarHoliday = _getSolarHoliday(_selectedDay!);
-                                    String? lunarHoliday = _getLunarHoliday(lunarSelected);
+                                    final lunarSelected = Lunar(
+                                      date: _selectedDay!,
+                                      createdFromSolar: true,
+                                    );
+                                    String? solarHoliday = _getSolarHoliday(
+                                      _selectedDay!,
+                                    );
+                                    String? lunarHoliday = _getLunarHoliday(
+                                      lunarSelected,
+                                    );
                                     List<String> holidays = [
                                       if (solarHoliday != null) solarHoliday,
                                       if (lunarHoliday != null) lunarHoliday,
                                     ];
-                                    String? holiday = holidays.isNotEmpty ? holidays.join(", ") : null;
+                                    String? holiday = holidays.isNotEmpty
+                                        ? holidays.join(", ")
+                                        : null;
 
                                     return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         // Event header
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   "📅 Ngày ${_selectedDay!.day}/${_selectedDay!.month}/${_selectedDay!.year}",
@@ -977,7 +1115,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                   "Âm lịch: ${lunarSelected.day}/${lunarSelected.month}",
                                                   style: TextStyle(
                                                     fontSize: 12,
-                                                    color: CalendarStyleHelper.lunarTextColor,
+                                                    color: CalendarStyleHelper
+                                                        .lunarTextColor,
                                                     fontStyle: FontStyle.italic,
                                                   ),
                                                 ),
@@ -986,27 +1125,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             Material(
                                               color: Colors.transparent,
                                               child: InkWell(
-                                                onTap: () => _showAddEventDialog(context, setStateDialog),
-                                                borderRadius: BorderRadius.circular(12),
+                                                onTap: () =>
+                                                    _showAddEventDialog(
+                                                      context,
+                                                      setStateDialog,
+                                                    ),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                                 child: Container(
-                                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 8,
+                                                  ),
                                                   decoration: BoxDecoration(
-                                                    gradient: LinearGradient(colors: zodiacGradient),
-                                                    borderRadius: BorderRadius.circular(12),
+                                                    gradient: LinearGradient(
+                                                      colors: zodiacGradient,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12,
+                                                        ),
                                                     boxShadow: [
                                                       BoxShadow(
-                                                        color: zodiacGradient[0].withOpacity(0.3),
+                                                        color: zodiacGradient[0]
+                                                            .withOpacity(0.3),
                                                         blurRadius: 6,
                                                         offset: Offset(0, 2),
                                                       ),
                                                     ],
                                                   ),
                                                   child: Row(
-                                                    mainAxisSize: MainAxisSize.min,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
                                                     children: [
-                                                      Icon(Icons.add, color: Colors.white, size: 18),
+                                                      Icon(
+                                                        Icons.add,
+                                                        color: Colors.white,
+                                                        size: 18,
+                                                      ),
                                                       SizedBox(width: 4),
-                                                      Text("Thêm", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                                                      Text(
+                                                        "Thêm",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 13,
+                                                        ),
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -1023,36 +1189,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             width: double.infinity,
                                             margin: EdgeInsets.only(bottom: 12),
                                             padding: EdgeInsets.all(14),
-                                            decoration: CalendarStyleHelper.holidayBannerDecoration(zodiacGradient),
+                                            decoration:
+                                                CalendarStyleHelper.holidayBannerDecoration(
+                                                  zodiacGradient,
+                                                ),
                                             child: Row(
                                               children: [
                                                 Container(
                                                   padding: EdgeInsets.all(8),
                                                   decoration: BoxDecoration(
-                                                    color: Color(0xFFE53935).withOpacity(0.1),
+                                                    color: Color(
+                                                      0xFFE53935,
+                                                    ).withOpacity(0.1),
                                                     shape: BoxShape.circle,
                                                   ),
-                                                  child: Text("🏮", style: TextStyle(fontSize: 18)),
+                                                  child: Text(
+                                                    "🏮",
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                    ),
+                                                  ),
                                                 ),
                                                 SizedBox(width: 12),
                                                 Expanded(
                                                   child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Text(
                                                         "Ngày lễ",
                                                         style: TextStyle(
                                                           fontSize: 11,
-                                                          color: Colors.grey[600],
-                                                          fontWeight: FontWeight.w600,
+                                                          color:
+                                                              Colors.grey[600],
+                                                          fontWeight:
+                                                              FontWeight.w600,
                                                         ),
                                                       ),
                                                       SizedBox(height: 2),
                                                       Text(
                                                         holiday,
                                                         style: TextStyle(
-                                                          color: Color(0xFFC62828),
-                                                          fontWeight: FontWeight.bold,
+                                                          color: Color(
+                                                            0xFFC62828,
+                                                          ),
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                           fontSize: 14,
                                                         ),
                                                       ),
@@ -1066,26 +1249,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         // Event list or empty state
                                         if (_selectedEvents.isEmpty)
                                           Container(
-                                            margin: EdgeInsets.symmetric(vertical: 20),
+                                            margin: EdgeInsets.symmetric(
+                                              vertical: 20,
+                                            ),
                                             padding: EdgeInsets.all(24),
                                             decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.6),
-                                              borderRadius: BorderRadius.circular(16),
-                                              border: Border.all(color: Colors.grey.shade200),
+                                              color: Colors.white.withOpacity(
+                                                0.6,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              border: Border.all(
+                                                color: Colors.grey.shade200,
+                                              ),
                                             ),
                                             child: Center(
                                               child: Column(
                                                 children: [
-                                                  Icon(Icons.event_available, size: 40, color: Colors.grey.shade300),
+                                                  Icon(
+                                                    Icons.event_available,
+                                                    size: 40,
+                                                    color: Colors.grey.shade300,
+                                                  ),
                                                   SizedBox(height: 8),
                                                   Text(
                                                     "Chưa có sự kiện",
-                                                    style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                                                    style: TextStyle(
+                                                      color: Colors.grey[500],
+                                                      fontSize: 14,
+                                                    ),
                                                   ),
                                                   SizedBox(height: 4),
                                                   Text(
                                                     "Nhấn nút \"Thêm\" để tạo sự kiện mới",
-                                                    style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                                                    style: TextStyle(
+                                                      color: Colors.grey[400],
+                                                      fontSize: 12,
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -1094,32 +1294,64 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         else
                                           ListView.separated(
                                             shrinkWrap: true,
-                                            physics: NeverScrollableScrollPhysics(),
+                                            physics:
+                                                NeverScrollableScrollPhysics(),
                                             itemCount: _selectedEvents.length,
-                                            separatorBuilder: (context, index) => SizedBox(height: 10),
+                                            separatorBuilder:
+                                                (context, index) =>
+                                                    SizedBox(height: 10),
                                             itemBuilder: (context, index) {
-                                              final event = _selectedEvents[index];
+                                              final event =
+                                                  _selectedEvents[index];
                                               return Container(
-                                                decoration: CalendarStyleHelper.eventCardDecoration(
-                                                  hasReminder: event.hasReminder,
-                                                ),
+                                                decoration:
+                                                    CalendarStyleHelper.eventCardDecoration(
+                                                      hasReminder:
+                                                          event.hasReminder,
+                                                    ),
                                                 child: Padding(
-                                                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 14,
+                                                    vertical: 12,
+                                                  ),
                                                   child: Row(
                                                     children: [
                                                       // Icon
                                                       Container(
-                                                        padding: EdgeInsets.all(10),
+                                                        padding: EdgeInsets.all(
+                                                          10,
+                                                        ),
                                                         decoration: BoxDecoration(
-                                                          color: (event.hasReminder
-                                                                  ? Color(0xFFE53935)
-                                                                  : Color(0xFF42A5F5))
-                                                              .withOpacity(0.1),
-                                                          borderRadius: BorderRadius.circular(12),
+                                                          color:
+                                                              (event.hasReminder
+                                                                      ? Color(
+                                                                          0xFFE53935,
+                                                                        )
+                                                                      : Color(
+                                                                          0xFF42A5F5,
+                                                                        ))
+                                                                  .withOpacity(
+                                                                    0.1,
+                                                                  ),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                12,
+                                                              ),
                                                         ),
                                                         child: Icon(
-                                                          event.hasReminder ? Icons.notifications_active : Icons.event_note,
-                                                          color: event.hasReminder ? Color(0xFFE53935) : Color(0xFF42A5F5),
+                                                          event.hasReminder
+                                                              ? Icons
+                                                                    .notifications_active
+                                                              : Icons
+                                                                    .event_note,
+                                                          color:
+                                                              event.hasReminder
+                                                              ? Color(
+                                                                  0xFFE53935,
+                                                                )
+                                                              : Color(
+                                                                  0xFF42A5F5,
+                                                                ),
                                                           size: 22,
                                                         ),
                                                       ),
@@ -1127,40 +1359,67 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                       // Content
                                                       Expanded(
                                                         child: Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Text(
                                                               event.title,
                                                               style: TextStyle(
-                                                                fontWeight: FontWeight.w700,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
                                                                 fontSize: 15,
-                                                                color: Color(0xFF263238),
+                                                                color: Color(
+                                                                  0xFF263238,
+                                                                ),
                                                               ),
                                                             ),
-                                                            if (event.note.isNotEmpty) ...[
-                                                              SizedBox(height: 3),
+                                                            if (event
+                                                                .note
+                                                                .isNotEmpty) ...[
+                                                              SizedBox(
+                                                                height: 3,
+                                                              ),
                                                               Text(
                                                                 event.note,
                                                                 style: TextStyle(
-                                                                  color: Colors.grey[600],
+                                                                  color: Colors
+                                                                      .grey[600],
                                                                   fontSize: 13,
                                                                 ),
                                                                 maxLines: 2,
-                                                                overflow: TextOverflow.ellipsis,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
                                                               ),
                                                             ],
-                                                            if (event.hasReminder) ...[
-                                                              SizedBox(height: 4),
+                                                            if (event
+                                                                .hasReminder) ...[
+                                                              SizedBox(
+                                                                height: 4,
+                                                              ),
                                                               Row(
                                                                 children: [
-                                                                  Icon(Icons.alarm, size: 12, color: Colors.orange),
-                                                                  SizedBox(width: 4),
+                                                                  Icon(
+                                                                    Icons.alarm,
+                                                                    size: 12,
+                                                                    color: Colors
+                                                                        .orange,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: 4,
+                                                                  ),
                                                                   Text(
                                                                     "Có nhắc nhở",
                                                                     style: TextStyle(
-                                                                      fontSize: 11,
-                                                                      color: Colors.orange[700],
-                                                                      fontWeight: FontWeight.w600,
+                                                                      fontSize:
+                                                                          11,
+                                                                      color: Colors
+                                                                          .orange[700],
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
                                                                     ),
                                                                   ),
                                                                 ],
@@ -1171,18 +1430,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                       ),
                                                       // Delete button
                                                       Material(
-                                                        color: Colors.transparent,
+                                                        color:
+                                                            Colors.transparent,
                                                         child: InkWell(
                                                           onTap: () async {
-                                                            await _calendarService.deleteEvent(widget.familyId, event.id);
+                                                            await _calendarService
+                                                                .deleteEvent(
+                                                                  widget
+                                                                      .familyId,
+                                                                  event.id,
+                                                                );
                                                             setStateDialog(() {
-                                                              _selectedEvents = _getEventsForDay(_selectedDay!);
+                                                              _selectedEvents =
+                                                                  _getEventsForDay(
+                                                                    _selectedDay!,
+                                                                  );
                                                             });
                                                           },
-                                                          borderRadius: BorderRadius.circular(8),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                8,
+                                                              ),
                                                           child: Padding(
-                                                            padding: EdgeInsets.all(8),
-                                                            child: Icon(Icons.delete_outline, size: 20, color: Colors.grey[400]),
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                  8,
+                                                                ),
+                                                            child: Icon(
+                                                              Icons
+                                                                  .delete_outline,
+                                                              size: 20,
+                                                              color: Colors
+                                                                  .grey[400],
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
@@ -1225,7 +1505,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     String? solarHoliday = _getSolarHoliday(day);
     String? lunarHoliday = _getLunarHoliday(lunarDate);
-    bool isWeekend = day.weekday == DateTime.saturday || day.weekday == DateTime.sunday;
+    bool isWeekend =
+        day.weekday == DateTime.saturday || day.weekday == DateTime.sunday;
     bool hasHoliday = solarHoliday != null || lunarHoliday != null;
     bool isRam = lunarDate.day == 15; // Rằm
     bool isMung1 = lunarDate.day == 1; // Mùng 1
@@ -1244,12 +1525,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     // Text styles
-    TextStyle dayStyle = CalendarStyleHelper.solarDateStyle(isSelected, isToday, isWeekend);
+    TextStyle dayStyle = CalendarStyleHelper.solarDateStyle(
+      isSelected,
+      isToday,
+      isWeekend,
+    );
     TextStyle lunarStyle = CalendarStyleHelper.lunarDateStyle(isSelected);
 
     if (!isSelected && hasHoliday) {
       dayStyle = dayStyle.copyWith(color: Color(0xFFE53935));
-      lunarStyle = lunarStyle.copyWith(color: Color(0xFFE53935), fontWeight: FontWeight.bold);
+      lunarStyle = lunarStyle.copyWith(
+        color: Color(0xFFE53935),
+        fontWeight: FontWeight.bold,
+      );
     }
 
     return Container(
@@ -1270,10 +1558,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Ngày dương — To, đậm
                 Text("${day.day}", style: dayStyle),
                 // Ngày âm — Nhỏ, nhạt
-                Text(
-                  "${lunarDate.day}/${lunarDate.month}",
-                  style: lunarStyle,
-                ),
+                Text("${lunarDate.day}/${lunarDate.month}", style: lunarStyle),
               ],
             ),
           ),
@@ -1285,8 +1570,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Đỏ: Ngày lễ
-                if (hasHoliday)
-                  CalendarStyleHelper.buildHolidayMarker(),
+                if (hasHoliday) CalendarStyleHelper.buildHolidayMarker(),
                 // Vàng: Rằm / Mùng 1
                 if (!hasHoliday && (isRam || isMung1))
                   CalendarStyleHelper.buildLunarSpecialMarker(),

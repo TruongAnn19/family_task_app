@@ -10,7 +10,8 @@ class AdminScreen extends StatefulWidget {
   _AdminScreenState createState() => _AdminScreenState();
 }
 
-class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStateMixin {
+class _AdminScreenState extends State<AdminScreen>
+    with SingleTickerProviderStateMixin {
   final AuthService _authService = AuthService();
   List<Member> _members = [];
   bool _isLoading = true;
@@ -43,7 +44,10 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
           children: [
             Icon(Icons.person_add, color: Colors.teal),
             SizedBox(width: 10),
-            Text(AppLocalizations.of(context)!.addMember, style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold)),
+            Text(
+              AppLocalizations.of(context)!.addMember,
+              style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         content: TextField(
@@ -60,24 +64,33 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context), // Hủy
-            child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.grey)),
+            child: Text(
+              AppLocalizations.of(context)!.cancel,
+              style: TextStyle(color: Colors.grey),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.teal,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () async {
               String name = _nameController.text.trim();
               if (name.isNotEmpty) {
                 // Gọi service thêm vào DB
                 await _authService.addMember(widget.familyId, name);
-                
+
                 Navigator.pop(context); // Đóng popup
                 _loadMembers(); // Tải lại danh sách để hiện tên mới
-                
+
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(AppLocalizations.of(context)!.addedMemberToFamily(name))),
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.addedMemberToFamily(name),
+                    ),
+                  ),
                 );
               }
             },
@@ -92,7 +105,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   void _deleteMember(Member member) async {
     if (member.isAdmin) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.cannotDeleteAdmin)),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.cannotDeleteAdmin),
+        ),
       );
       return;
     }
@@ -106,19 +121,30 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
           children: [
             Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
             SizedBox(width: 10),
-            Text(AppLocalizations.of(context)!.confirmDelete, style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              AppLocalizations.of(context)!.confirmDelete,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
-        content: Text(AppLocalizations.of(context)!.areYouSureDeleteMember(member.name), style: TextStyle(fontSize: 16)),
+        content: Text(
+          AppLocalizations.of(context)!.areYouSureDeleteMember(member.name),
+          style: TextStyle(fontSize: 16),
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx), 
-            child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.grey))
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              AppLocalizations.of(context)!.cancel,
+              style: TextStyle(color: Colors.grey),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red.shade400,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () async {
               Navigator.pop(ctx);
@@ -208,14 +234,21 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           ],
                         ),
                         child: ListTile(
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           leading: CircleAvatar(
-                            backgroundColor: member.isAdmin ? Colors.orange.shade100 : Colors.teal.shade50,
+                            backgroundColor: member.isAdmin
+                                ? Colors.orange.shade100
+                                : Colors.teal.shade50,
                             radius: 24,
                             child: Text(
                               member.name[0].toUpperCase(),
                               style: TextStyle(
-                                color: member.isAdmin ? Colors.orange.shade800 : Colors.teal.shade800,
+                                color: member.isAdmin
+                                    ? Colors.orange.shade800
+                                    : Colors.teal.shade800,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -223,10 +256,15 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           ),
                           title: Text(
                             member.name,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                           subtitle: Text(
-                            member.isAdmin ? AppLocalizations.of(context)!.headOfHousehold : AppLocalizations.of(context)!.regularMember,
+                            member.isAdmin
+                                ? AppLocalizations.of(context)!.headOfHousehold
+                                : AppLocalizations.of(context)!.regularMember,
                             style: TextStyle(color: Colors.grey[600]),
                           ),
                           trailing: member.isAdmin
@@ -234,12 +272,19 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                   padding: EdgeInsets.all(6),
                                   decoration: BoxDecoration(
                                     color: Colors.orange.shade50,
-                                    shape: BoxShape.circle
+                                    shape: BoxShape.circle,
                                   ),
-                                  child: Icon(Icons.star, color: Colors.orange, size: 20)
+                                  child: Icon(
+                                    Icons.star,
+                                    color: Colors.orange,
+                                    size: 20,
+                                  ),
                                 )
                               : IconButton(
-                                  icon: Icon(Icons.delete_outline, color: Colors.red.shade300),
+                                  icon: Icon(
+                                    Icons.delete_outline,
+                                    color: Colors.red.shade300,
+                                  ),
                                   onPressed: () => _deleteMember(member),
                                 ),
                         ),

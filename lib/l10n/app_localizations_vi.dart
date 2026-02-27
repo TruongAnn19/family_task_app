@@ -272,4 +272,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get addMemberFab => 'Thêm Thành Viên';
+
+  @override
+  String get switchLanguage => 'Đổi Ngôn Ngữ';
 }

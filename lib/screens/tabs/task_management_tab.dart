@@ -5,7 +5,8 @@ import 'package:family_task_app/l10n/app_localizations.dart';
 
 class TaskManagementScreen extends StatefulWidget {
   final String familyId;
-  const TaskManagementScreen({Key? key, required this.familyId}) : super(key: key);
+  const TaskManagementScreen({Key? key, required this.familyId})
+    : super(key: key);
 
   @override
   _TaskManagementScreenState createState() => _TaskManagementScreenState();
@@ -67,13 +68,21 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setStateDialog) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             title: Row(
-               children: [
-                 Icon(Icons.add_task, color: Colors.teal),
-                 SizedBox(width: 10),
-                 Text(AppLocalizations.of(context)!.addNewTask, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal)),
-               ]
+              children: [
+                Icon(Icons.add_task, color: Colors.teal),
+                SizedBox(width: 10),
+                Text(
+                  AppLocalizations.of(context)!.addNewTask,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.teal,
+                  ),
+                ),
+              ],
             ),
             content: SingleChildScrollView(
               child: Column(
@@ -86,7 +95,9 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context)!.taskNameLabel,
                       hintText: AppLocalizations.of(context)!.taskNameHint,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       prefixIcon: Icon(Icons.edit, color: Colors.teal),
                       filled: true,
                       fillColor: Colors.grey[50],
@@ -95,14 +106,25 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                   SizedBox(height: 16),
 
                   // 2. Chọn kịch bản
-                  Text(AppLocalizations.of(context)!.taskDivisionLabel, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal[800])),
+                  Text(
+                    AppLocalizations.of(context)!.taskDivisionLabel,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.teal[800],
+                    ),
+                  ),
                   SizedBox(height: 8),
                   DropdownButtonFormField<int>(
                     value: _selectedScenario,
                     isExpanded: true, // Để text dài không bị lỗi
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
                       filled: true,
                       fillColor: Colors.grey[50],
                     ),
@@ -110,7 +132,7 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                       return DropdownMenuItem(
                         value: entry.key,
                         child: Text(
-                          entry.value, 
+                          entry.value,
                           style: TextStyle(fontSize: 14),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -120,7 +142,7 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                       setStateDialog(() => _selectedScenario = val!);
                     },
                   ),
-                  
+
                   // 3. Hiển thị giải thích chi tiết
                   Container(
                     margin: EdgeInsets.only(top: 12),
@@ -128,7 +150,7 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                     decoration: BoxDecoration(
                       color: Colors.blue.shade50,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue.shade100)
+                      border: Border.all(color: Colors.blue.shade100),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +160,10 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                         Expanded(
                           child: Text(
                             _getScenarioDescription(context, _selectedScenario),
-                            style: TextStyle(fontSize: 13, color: Colors.blue[900]),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.blue[900],
+                            ),
                           ),
                         ),
                       ],
@@ -153,9 +178,16 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         labelText: AppLocalizations.of(context)!.offsetLabel,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        helperText: AppLocalizations.of(context)!.offsetHelperText,
-                        prefixIcon: Icon(Icons.exposure_plus_1, color: Colors.teal),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        helperText: AppLocalizations.of(
+                          context,
+                        )!.offsetHelperText,
+                        prefixIcon: Icon(
+                          Icons.exposure_plus_1,
+                          color: Colors.teal,
+                        ),
                       ),
                     ),
                   ],
@@ -165,12 +197,17 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.grey)),
+                child: Text(
+                  AppLocalizations.of(context)!.cancel,
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
+                  backgroundColor: Colors.teal,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onPressed: () async {
                   if (_nameController.text.isNotEmpty) {
@@ -251,98 +288,158 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
             child: _isLoading
                 ? Center(child: CircularProgressIndicator(color: Colors.teal))
                 : _tasks.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Colors.teal.shade50,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(Icons.playlist_add, size: 64, color: Colors.teal.shade300),
-                            ),
-                            SizedBox(height: 24),
-                            Text(
-                              AppLocalizations.of(context)!.noTasksYet,
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[800]),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              AppLocalizations.of(context)!.tapPlusToAdd,
-                              style: TextStyle(color: Colors.grey[600]),
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.teal.shade50,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.playlist_add,
+                            size: 64,
+                            color: Colors.teal.shade300,
+                          ),
+                        ),
+                        SizedBox(height: 24),
+                        Text(
+                          AppLocalizations.of(context)!.noTasksYet,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          AppLocalizations.of(context)!.tapPlusToAdd,
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: EdgeInsets.all(20),
+                    itemCount: _tasks.length,
+                    itemBuilder: (context, index) {
+                      final task = _tasks[index];
+                      return Container(
+                        margin: EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 8,
+                              offset: Offset(0, 3),
                             ),
                           ],
                         ),
-                      )
-                    : ListView.builder(
-                        padding: EdgeInsets.all(20),
-                        itemCount: _tasks.length,
-                        itemBuilder: (context, index) {
-                          final task = _tasks[index];
-                          return Container(
-                            margin: EdgeInsets.only(bottom: 12),
+                        child: ListTile(
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          leading: Container(
+                            padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.04),
-                                  blurRadius: 8,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
+                              color: Colors.teal.shade50,
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              leading: Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.teal.shade50,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Icon(_getIconForScenario(task.scenario), color: Colors.teal),
+                            child: Icon(
+                              _getIconForScenario(task.scenario),
+                              color: Colors.teal,
+                            ),
+                          ),
+                          title: Text(
+                            task.title,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Text(
+                              _getScenarioLabels(context)[task.scenario] ??
+                                  AppLocalizations.of(context)!.other,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[600],
                               ),
-                              title: Text(task.title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 4.0),
-                                child: Text(
-                                  _getScenarioLabels(context)[task.scenario] ?? AppLocalizations.of(context)!.other,
-                                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                                ),
-                              ),
-                              trailing: IconButton(
-                                icon: Icon(Icons.delete_outline, color: Colors.red.shade300),
-                                onPressed: () async {
-                                  // Thêm confirm dialog cho chắc chắn
-                                  bool confirm = await showDialog(
+                            ),
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(
+                              Icons.delete_outline,
+                              color: Colors.red.shade300,
+                            ),
+                            onPressed: () async {
+                              // Thêm confirm dialog cho chắc chắn
+                              bool confirm =
+                                  await showDialog(
                                     context: context,
                                     builder: (ctx) => AlertDialog(
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                      title: Text(AppLocalizations.of(context)!.deleteThisTask),
-                                      content: Text(AppLocalizations.of(context)!.areYouSureDeleteTask(task.title)),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      title: Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.deleteThisTask,
+                                      ),
+                                      content: Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.areYouSureDeleteTask(task.title),
+                                      ),
                                       actions: [
-                                        TextButton(onPressed: ()=>Navigator.pop(ctx, false), child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.grey))),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(ctx, false),
+                                          child: Text(
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.cancel,
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
                                         ElevatedButton(
-                                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                            onPressed: ()=>Navigator.pop(ctx, true), 
-                                            child: Text(AppLocalizations.of(context)!.delete)
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                          ),
+                                          onPressed: () =>
+                                              Navigator.pop(ctx, true),
+                                          child: Text(
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.delete,
+                                          ),
                                         ),
                                       ],
-                                    )
-                                  ) ?? false;
+                                    ),
+                                  ) ??
+                                  false;
 
-                                  if (confirm) {
-                                     await _authService.removeTaskConfig(widget.familyId, task);
-                                     _loadTasks();
-                                  }
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                              if (confirm) {
+                                await _authService.removeTaskConfig(
+                                  widget.familyId,
+                                  task,
+                                );
+                                _loadTasks();
+                              }
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -358,10 +455,14 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
 
   IconData _getIconForScenario(int scenario) {
     switch (scenario) {
-      case 2: return Icons.person; // Sống 1 mình
-      case 3: return Icons.attribution; // Thầu khoán
-      case 5: return Icons.touch_app; // Theo lượt
-      default: return Icons.sync; // Xoay vòng
+      case 2:
+        return Icons.person; // Sống 1 mình
+      case 3:
+        return Icons.attribution; // Thầu khoán
+      case 5:
+        return Icons.touch_app; // Theo lượt
+      default:
+        return Icons.sync; // Xoay vòng
     }
   }
 }
